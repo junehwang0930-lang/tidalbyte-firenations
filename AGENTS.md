@@ -12,24 +12,24 @@ MVP: interactive 2D floorplan, simulated user location, simulated fire/smoke and
 
 ## Shared project setup
 
-Recommended stack (confirm with team before changing it): React + TypeScript + Vite, SVG for the 2D map, TypeScript for the hazard simulation and routing engine, JSON fixtures, npm and GitHub. Keep the MVP client-side; no database or server is required. If an existing application already uses a different stack, discuss before replacing it.
+Agreed stack: React + TypeScript + Vite frontend, SVG for the 2D map, Python + FastAPI backend, Python for the hazard simulation and routing engine, Pydantic request/response models, JSON fixtures, npm for the frontend, a Python virtual environment and requirements.txt for the backend, and GitHub. Use HTTP/JSON between frontend and backend. No database, authentication, external sensor connections, or cloud deployment is required for the MVP.
 
-Establish the shared app scaffold, types and fictional fixture on main through a team-approved setup commit before feature implementations diverge. Use one package manager and commit its lockfile. Do not each create a separate app.
+Establish the shared app scaffold, types and fictional fixture on main through a team-approved setup commit before feature implementations diverge. Use npm and commit its lockfile; pin Python dependencies in requirements.txt. Keep one shared frontend and one shared backend. Include setup/run/test instructions for Windows PowerShell and other systems; exclude .venv/, node_modules/, build output, caches and secrets from Git.
 
 ## Branch and file ownership
 
 | Owner | Branch | Primary files |
 | --- | --- | --- |
-| Person 1 — Map & Frontend | feature/map-frontend | public/maps/, src/components/, src/App.tsx |
-| Person 2 — Hazard Simulation | feature/hazard-simulation | src/simulation/ |
-| Person 3 — Pathfinding | feature/pathfinding | src/pathfinding/ |
-| Shared (coordinate before editing) | main via reviewed PRs | src/types/, src/data/, package.json, tests/, AGENTS.md |
+| Person 1 — Map & Frontend | feature/map-frontend | frontend/public/maps/, frontend/src/components/, frontend/src/App.tsx |
+| Person 2 — Hazard Simulation | feature/hazard-simulation | backend/app/simulation/, backend/app/routers/simulation.py, backend/tests/test_simulation.py |
+| Person 3 — Pathfinding | feature/pathfinding | backend/app/pathfinding/, backend/app/routers/pathfinding.py, backend/tests/test_pathfinding.py |
+| Shared (coordinate before editing) | main via reviewed PRs | backend/app/models.py, backend/app/main.py, frontend/src/types/, frontend/src/api/, data/, dependencies, AGENTS.md |
 
-Suggested structure: public/maps/; src/components/; src/simulation/; src/pathfinding/; src/data/; src/types/; src/App.tsx; tests/. These are proposed directories, not a claim they already exist. Feature-specific tests may live alongside owned modules. Do not rename/reformat another owner's files or change shared contracts without coordination.
+Suggested structure: frontend/ (src/components/, src/types/, src/api/, src/App.tsx, public/maps/); backend/ (app/main.py, app/models.py, app/simulation/, app/pathfinding/, app/routers/, tests/, requirements.txt); data/ (shared fictional JSON fixtures); README.md; AGENTS.md. These are proposed directories, not a claim they already exist. Do not rename/reformat another owner's files or change shared contracts without coordination.
 
 ## Proposed shared data contract
 
-Agree on the exact TypeScript definitions in src/types/ before implementing. Use stable string IDs, a single coordinate system, and consistent units (meters for distances where known; arbitrary demo units otherwise; seconds for simulated time). Example shape:
+Define authoritative Pydantic models in backend/app/models.py and matching TypeScript interfaces in frontend/src/types/ before implementing. Preserve the specified camelCase JSON wire keys consistently (Pydantic aliases are acceptable). Use stable string IDs, a single coordinate system, and consistent units (meters for distances where known; arbitrary demo units otherwise; seconds for simulated time). Example shape:
 
 - BuildingGraph: nodes [{id, areaId, x, y, floor, kind}], edges [{id, from, to, distance, bidirectional}], exitNodeIds [nodeId]. Node kind can be room, corridor, junction, or exit. Use only modeled traversable connections; do not infer exits from an image. The same coordinate system must align with the SVG.
 - HazardSnapshot: time (simulated seconds), areas [{id, fireRisk, smokeRisk}], blockedEdges [edgeId]. Risks are finite numbers in [0,1], illustrative risk scores only. Area IDs match the graph; blocked edge IDs match the graph. Explicitly distinguish missing/unknown input from zero risk.
@@ -41,10 +41,10 @@ Use mock fixtures in early development so modules can be developed and tested in
 ## Module responsibilities
 
 1. Map/frontend: render the fictional graph/floorplan, show user and simulated hazard state, display the routing result and no-route state, expose scenario/time controls. Provide map and graph data together.
-2. Hazard simulation: generate deterministic mock HazardSnapshot values over time and scenarios; expose a small interface returning a snapshot independent of React. Use simplified illustrative values; no claims of real fire dynamics. Future scientific data providers must fit the same contract.
+2. Hazard simulation: generate deterministic mock HazardSnapshot values over time and scenarios; expose a small Python interface returning a snapshot independent of FastAPI and React. Use simplified illustrative values; no claims of real fire dynamics. Future scientific data providers must fit the same contract.
 3. Pathfinding: implement a pure function accepting BuildingGraph, HazardSnapshot, and UserLocation. Use nonnegative hazard/distance costs in Dijkstra initially, exclude blocked or unknown/invalid modeled pathways, evaluate eligible exits, return explicit no-route/invalid-input states, and recompute on snapshot changes. No UI code or independent hazard simulation. Test ordinary route, competing exits, blocked edge, changed snapshot, disconnected graph, malformed input, and no-route cases. Never describe demo results as guaranteed safe.
 
-Integration flow: graph + user location + hazard snapshot -> routing engine -> RouteResult -> frontend. The frontend should call the routing module again on updated snapshots.
+Integration flow: React frontend -> FastAPI JSON API -> Python hazard simulation and routing modules -> JSON response -> React visualization. Keep algorithms as pure/testable Python functions, separate from the HTTP routers. Initial shared endpoints: GET /health (health check) and GET /api/graph (fictional graph fixture). Proposed feature endpoints: POST /api/simulation (scenario and simulated time -> HazardSnapshot), POST /api/route (BuildingGraph, HazardSnapshot, UserLocation -> RouteResult). Coordinate exact request models and route registration on main. The frontend requests a fresh route when the hazard snapshot or simulated user location changes. Configure Vite's development proxy or explicit development-only CORS; no hardcoded production URLs.
 
 ## Git workflow and AI agent rules
 

@@ -19,7 +19,22 @@ export const edges = [
   ["start", "refuge", "refuge-door"],
 ];
 export const metres = (a, b) => Math.hypot(a[0] - b[0], a[1] - b[1]) / 5;
+// Prototype deadline contract: an explicit null means this scenario models no
+// hazard arrival. An absent value is unknown and must not be traversed.
+export function canTraverse(zone, arrival, h) {
+  if (!Number.isFinite(arrival) || arrival < 0 || !h ||
+      !Array.isArray(h.closed) || !h.deadlines ||
+      !Object.hasOwn(h.deadlines, zone) || h.closed.includes(zone)) return false;
+  const deadline = h.deadlines[zone];
+  return deadline === null ||
+    (Number.isFinite(deadline) && deadline >= 0 && arrival + 5 < deadline);
+}
 export function plan(start, t, h) {
+  if (!Object.hasOwn(nodes, start) || !Number.isFinite(t) || t < 0 ||
+      !h || !Array.isArray(h.closed) || !h.closed.every(zone => typeof zone === "string") ||
+      !h.deadlines || typeof h.deadlines !== "object" || Array.isArray(h.deadlines) ||
+      Object.values(h.deadlines).some(value => value !== null &&
+        (!Number.isFinite(value) || value < 0))) return null;
   const queue = [{ id: start, path: [start], distance: 0 }],
     seen = new Set();
   let fallback = null;
@@ -35,7 +50,7 @@ export function plan(start, t, h) {
       const next = a === item.id ? b : b === item.id ? a : null;
       if (!next || seen.has(next) || h.closed.includes(zone)) continue;
       const distance = item.distance + metres(nodes[item.id], nodes[next]);
-      if (t + distance / 1.25 + 5 >= (h.deadlines[zone] ?? Infinity)) continue;
+      if (!canTraverse(zone, t + distance / 1.25, h)) continue;
       queue.push({ id: next, path: [...item.path, next], distance });
     }
   }

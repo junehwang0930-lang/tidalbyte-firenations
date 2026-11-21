@@ -1,6 +1,7 @@
 import { useEffect, useRef, useState } from 'react';
 import { getGraph } from './api';
 import CameraPanel from './components/CameraPanel';
+import FloorSelect from './components/FloorSelect';
 import FloorMap, { floors } from './components/FloorMap';
 import type { Floor } from './components/FloorMap';
 import type { BuildingGraph, GraphNode } from './types';
@@ -37,17 +38,9 @@ export default function App() {
   const map = <FloorMap floor={floor} route={floorHasScenario && hasRoute ? route : []}
     radius={phase === 0 ? 47 : 72}
     fire={floorHasScenario ? nodes.get(phase === 0 ? 'room-a' : 'hall-east') : undefined} />;
-  const floorPicker = <label className="floor-picker">
-    <span>Floor</span>
-    <select aria-label="Building floor" value={floor} onChange={event => {
-      const selected = floors.find(value => String(value) === event.target.value);
-      if (selected !== undefined) setFloor(selected);
-    }}>
-      {floors.map(value => <option key={value} value={value}>Floor {value}</option>)}
-    </select>
-  </label>;
+  const floorPicker = <FloorSelect floors={floors} value={floor} onChange={setFloor} />;
   const legend = floorHasScenario
-    ? <><span className="heat-ramp" aria-hidden="true" />High → low simulated fire intensity</>
+    ? <><span className="heat-ramp" aria-hidden="true" />Simulated fire intensity, high to low</>
     : 'Fictional floor plan · No simulation data';
 
   useEffect(() => {
@@ -71,13 +64,20 @@ export default function App() {
 
   return (
     <main className={camera ? `dashboard camera-layout${cameraExpanded ? ' camera-layout-expanded' : ''}` : 'dashboard'}>
-      <header className="brand">Fire Nations</header>
-      <section className="title">
-        <p>Fictional MSC</p>
-        <h1>Evacuation map</h1>
+      <header className="title">
+        <p>Fire Nations · Fictional MSC</p>
+        <h1>Evacuation</h1>
+      </header>
+      <section className="route-card" aria-label="Demo route" data-ok={floorHasScenario && hasRoute}>
+        <span className="route-icon" aria-hidden="true">
+          <svg className="icon" viewBox="0 0 24 24"><path d="M5 20v-9a3 3 0 0 1 3-3h11m-4-4 4 4-4 4" /></svg>
+        </span>
+        <div><small>Simulated route</small><strong>{routeStatus}</strong></div>
       </section>
       <section className="map-card" aria-label="Simulation map">
-        <div className="map-label">{floorPicker}{camera ? <button className="glass-control" type="button" onClick={refreshRoute}>Refresh route</button> : <span>Floor plan</span>}</div>
+        <div className="map-label">{floorPicker}{camera && <button className="pill" type="button" onClick={refreshRoute}>
+          <svg className="icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M20 4v6h-6m6 0a8 8 0 1 0 0 5" /></svg>
+          <span className="sr-only">Refresh route</span></button>}</div>
         <button type="button" className="map-trigger" aria-label="Open full-screen floor plan"
           onClick={() => mapDialog.current?.showModal()}>
           {map}<svg className="expand icon" viewBox="0 0 24 24" aria-hidden="true">
@@ -86,33 +86,25 @@ export default function App() {
         </button>
         <div className="legend">{legend}</div>
       </section>
-      <section className="route-status" aria-label="Demo route">
-        <svg className="route-icon icon" viewBox="0 0 24 24" aria-hidden="true">
-          <path d="M5 20v-9a3 3 0 0 1 3-3h11m-4-4 4 4-4 4" />
-        </svg>
-        <div><small>Simulated route</small><strong>{routeStatus}</strong></div>
-        <span className="snapshot">Snapshot {snapshot + 1}</span>
-      </section>
       <div className="actions">
-        <button ref={cameraButton} type="button" onClick={() => setCamera(true)}><svg className="icon" viewBox="0 0 24 24" aria-hidden="true">
+        <button ref={cameraButton} className="primary" type="button" onClick={() => setCamera(true)}><svg className="icon" viewBox="0 0 24 24" aria-hidden="true">
           <path d="M3 7h4l2-3h6l2 3h4v13H3z" /><circle cx="12" cy="13" r="3" />
-        </svg>Camera AR view</button>
-        <button type="button" onClick={refreshRoute}><svg className="icon" viewBox="0 0 24 24" aria-hidden="true">
+        </svg>Open AR camera</button>
+        <button className="secondary" type="button" onClick={refreshRoute}><svg className="icon" viewBox="0 0 24 24" aria-hidden="true">
           <path d="M20 4v6h-6m6 0a8 8 0 1 0 0 5" />
-        </svg>Refresh route</button>
+        </svg>Refresh route<span className="snapshot">#{snapshot + 1}</span></button>
       </div>
       <p className="sr-only" role="status">{announcement} {routeStatus}</p>
-      <footer><strong>Simulation only.</strong> Follow official alarms and emergency personnel.</footer>
+      <footer><strong>Simulation only.</strong> Not a validated safety system. Follow official alarms and emergency personnel.</footer>
       <dialog className="overlay fullscreen" ref={mapDialog} aria-labelledby="map-title">
         <header className="dialog-header"><h2 id="map-title" className="sr-only">Full-screen floor plan</h2>{floorPicker}
-          <button className="close" type="button" aria-label="Close full-screen map"
-            onClick={() => mapDialog.current?.close()}>×</button>
+          <button className="pill" type="button" onClick={() => mapDialog.current?.close()}>Done</button>
         </header>
         <div className="full-map">{map}</div>
         <div className="legend">{legend}</div>
         <footer>Simulation only · Fictional floor plan</footer>
       </dialog>
-      {camera && <CameraPanel onClose={closeCamera} direction={floorHasScenario ? direction : ''}
+      {camera && <CameraPanel onClose={closeCamera} route={floorHasScenario && hasRoute ? route : []} edges={graph.edges}
         expanded={cameraExpanded} onExpand={setCameraExpanded} />}
     </main>
   );

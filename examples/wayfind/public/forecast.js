@@ -2,13 +2,16 @@
 export const forecast = {
   source: "Illustrative zone timeline",
   license: "Project fixture",
+  // Explicit scenario coverage, not evidence about any real building.
+  modeledZones: ["gallery", "east-hall", "east-door", "west-hall", "south-hall", "west-door", "refuge-door"],
   events: [
     { scenario: "fire", kind: "fire", zone: "fire-room", afterSeconds: 0 },
     { scenario: "smoke", kind: "smoke", zone: "east-hall", afterSeconds: 25 },
   ],
 };
 export function arrivalTimes(preset, origin, data = forecast) {
-  const deadlines = {};
+  // null means explicitly modeled with no arrival; absent means unknown.
+  const deadlines = Object.fromEntries((data.modeledZones ?? []).map(zone => [zone, null]));
   for (const e of data.events) {
     if (
       (e.scenario !== "fire" && e.scenario !== preset) ||

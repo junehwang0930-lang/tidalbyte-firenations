@@ -14,3 +14,10 @@ test("mapped offline forecast keeps earliest hazard for an edge", () => {
     13,
   );
 });
+
+test("default forecast explicitly identifies modeled unaffected zones", () => {
+  assert.equal(arrivalTimes('fire', 0).gallery, null);
+  assert.equal(arrivalTimes('fire', 0)['unmodeled-zone'], undefined);
+  assert.equal(arrivalTimes('smoke', 10)['east-hall'], 35);
+  assert.equal(arrivalTimes('fire', 0, { events: [] }).gallery, undefined);
+});

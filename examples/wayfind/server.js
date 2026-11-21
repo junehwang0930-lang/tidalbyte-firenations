@@ -4,10 +4,12 @@ import fs from "node:fs";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
 import { createRequire } from "node:module";
+import { randomUUID } from "node:crypto";
 const root = fileURLToPath(new URL("./public/", import.meta.url));
 const require = createRequire(import.meta.url);
 const QR = require("./public/vendor/QRCode/index.js");
 const streams = new Set();
+const sessionId = randomUUID();
 let seq = 0,
   epoch = 0,
   clock = 0,
@@ -18,6 +20,7 @@ let seq = 0,
 const time = () =>
   clock + (started === null ? 0 : (Date.now() - started) / 1000);
 const snapshot = () => ({
+  sessionId,
   epoch,
   seq,
   t: time(),
@@ -65,11 +68,16 @@ function handle(req, res) {
     return;
   }
   if (req.method === "POST" && url.pathname === "/api/control") {
-    if (
-      req.headers.origin &&
-      new URL(req.headers.origin).host !== req.headers.host
-    )
-      return json(403, {});
+    if (req.headers.origin !== undefined) {
+      try {
+        const origin = new URL(req.headers.origin);
+        // Permit the documented HTTPS reverse proxy to forward to local HTTP.
+        if (!["http:", "https:"].includes(origin.protocol) || origin.host !== req.headers.host)
+          return json(403, { error: "Origin not allowed" });
+      } catch {
+        return json(403, { error: "Origin not allowed" });
+      }
+    }
     const op = url.searchParams.get("op");
     if (op === "reset") {
       epoch++;

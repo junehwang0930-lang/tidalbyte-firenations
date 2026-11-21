@@ -72,16 +72,60 @@ footer strong { color: #ffae98; }
 .full-map { display: grid; place-items: center; flex: 1; min-height: 0; padding: 12px; }
 .full-map svg { max-height: 100%; max-width: 900px; }
 .overlay footer { padding: 0 16px 16px; margin-top: 0; }
-.camera-frame { position: relative; overflow: hidden; min-height: 220px; background: #1b2c3e; isolation: isolate; }
-.camera-frame video { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; z-index: -1; }
-.camera-guide {
-  position: absolute; inset: 0; display: grid; place-content: center; justify-items: center; gap: 8px;
+.camera-dialog { overflow: auto; background: #121820; }
+.camera-frame {
+  position: relative; isolation: isolate; display: flex; flex-direction: column;
+  justify-content: space-between; gap: 16px; padding: 12px;
+  min-height: min(560px, 78dvh); background: #1a222b;
 }
-.camera-guide strong, .camera-guide span, .camera-note { background: rgb(10 21 34 / 88%); padding: 5px 12px; border-radius: 9px; }
-.camera-guide strong { color: #91e8fa; font-size: 3.7rem; line-height: 1; }
-.camera-note { position: absolute; bottom: 0; left: 10px; right: 10px; font-size: .72rem; text-align: center; }
-.camera-status { padding: 0 16px; margin: 8px 0 0; font-size: .85rem; color: #c6d1df; }
-.dialog-actions { display: flex; flex-wrap: wrap; gap: 8px; padding: 16px; }
-.dialog-actions button { flex: 1 0 auto; }
-.fullscreen .camera-frame { flex: 1; }
+.fullscreen .camera-frame { flex: 1; min-height: 100%; }
+.camera-frame video, .camera-scene, .camera-guide {
+  position: absolute; inset: 0; width: 100%; height: 100%; pointer-events: none;
+}
+.camera-frame video { object-fit: cover; z-index: -3; }
+.camera-scene { z-index: -2; overflow: hidden; background: radial-gradient(ellipse at 50% 44%, #617180, #293540 59%, #161e28); }
+.camera-frame[data-live="true"] .camera-scene { display: none; }
+.camera-corridor {
+  position: absolute; inset: 44% -40% -40%;
+  transform: perspective(240px) rotateX(52deg); transform-origin: center top;
+  border: 3px solid #7a8b99;
+  background:
+    repeating-linear-gradient(90deg, #566673 0 1px, transparent 1px 56px),
+    repeating-linear-gradient(#566673 0 1px, #35434f 1px 48px);
+}
+.camera-header, .camera-dock {
+  position: relative; z-index: 1; border: 1px solid rgb(235 248 255 / 23%);
+  background: rgb(16 23 32 / 83%); border-radius: 20px;
+  box-shadow: 0 6px 24px rgb(0 0 0 / 22%);
+}
+@supports (backdrop-filter: blur(16px)) {
+  .camera-header, .camera-dock {
+    background: rgb(16 23 32 / 68%); backdrop-filter: blur(16px) saturate(132%);
+  }
+}
+.camera-header { display: flex; justify-content: space-between; align-items: flex-start; gap: 12px; padding: 12px; }
+.camera-header .close { border-radius: 50%; background: rgb(255 255 255 / 9%); }
+.camera-instruction span, .camera-note, .camera-status { color: #d1dde9; font-size: .75rem; }
+.camera-instruction h2 { font-size: .85rem; font-weight: 500; margin: 4px 0; }
+.camera-instruction strong { display: block; font-size: 1.5rem; line-height: 1.15; }
+.camera-guide { display: grid; place-items: center; z-index: -1; }
+.camera-lane {
+  width: 58%; height: 45%; max-width: 380px;
+  transform: translateY(12%);
+  background: linear-gradient(180deg, #69d9ef12 5%, #4bbdeac9 100%);
+  clip-path: polygon(45% 0, 55% 0, 100% 100%, 0 100%); border-radius: 22px;
+  display: flex; flex-direction: column; align-items: center; justify-content: space-evenly;
+}
+.camera-lane-west { transform: translate(-8%, 12%) skewX(14deg); }
+.camera-lane span {
+  width: 24%; height: 12%; background: #fff;
+  clip-path: polygon(50% 0, 100% 78%, 95% 100%, 50% 64%, 5% 100%, 0 78%);
+}
+.camera-lane span:first-child { width: 10%; opacity: .5; }
+.camera-lane span:nth-child(2) { width: 16%; opacity: .75; }
+.camera-dock { padding: 12px; }
+.camera-note, .camera-status { margin: 0; line-height: 1.4; }
+.camera-status { margin-top: 4px; }
+.dialog-actions { display: flex; flex-wrap: wrap; gap: 8px; padding-top: 8px; }
+.dialog-actions button { flex: 1 0 auto; background: rgb(255 255 255 / 8%); }
 .sr-only { position: absolute; width: 1px; height: 1px; overflow: hidden; clip-path: inset(50%); }

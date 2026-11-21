@@ -44,28 +44,36 @@ export default function App() {
 
   return (
     <main className="dashboard">
-      <header className="brand"><span className="brand-icon" aria-hidden="true">◆</span> Fire Nations</header>
+      <header className="brand">Fire Nations</header>
       <section className="title">
-        <p>FICTIONAL MSC</p>
+        <p>Fictional MSC</p>
         <h1>Evacuation map</h1>
       </section>
       <section className="map-card" aria-label="Simulation map">
-        <div className="map-label"><strong>Floor 1</strong><span>2D FLOOR PLAN</span></div>
+        <div className="map-label"><strong>Floor 1</strong><span>Floor plan</span></div>
         <button type="button" className="map-trigger" aria-label="Open full-screen floor plan"
           onClick={() => mapDialog.current?.showModal()}>
-          {map}<span className="expand" aria-hidden="true">⤢</span>
+          {map}<svg className="expand icon" viewBox="0 0 24 24" aria-hidden="true">
+            <path d="M14 4h6v6M20 4l-6 6M10 20H4v-6m0 6 6-6" />
+          </svg>
         </button>
         <div className="legend"><span className="heat-ramp" aria-hidden="true" />
           <span>High → low simulated fire intensity</span></div>
       </section>
       <section className="route-status" aria-label="Demo route">
-        <span className="route-icon" aria-hidden="true">↱</span>
-        <div><small>SIMULATED ROUTE</small><strong>{direction || 'No demo route available'}</strong></div>
+        <svg className="route-icon icon" viewBox="0 0 24 24" aria-hidden="true">
+          <path d="M5 20v-9a3 3 0 0 1 3-3h11m-4-4 4 4-4 4" />
+        </svg>
+        <div><small>Simulated route</small><strong>{direction || 'No demo route available'}</strong></div>
         <span className="snapshot">Snapshot {snapshot + 1}</span>
       </section>
       <div className="actions">
-        <button type="button" onClick={() => setCamera(true)}><span aria-hidden="true">◉</span>Camera AR view</button>
-        <button type="button" onClick={refreshRoute}><span aria-hidden="true">↻</span>Refresh route</button>
+        <button type="button" onClick={() => setCamera(true)}><svg className="icon" viewBox="0 0 24 24" aria-hidden="true">
+          <path d="M3 7h4l2-3h6l2 3h4v13H3z" /><circle cx="12" cy="13" r="3" />
+        </svg>Camera AR view</button>
+        <button type="button" onClick={refreshRoute}><svg className="icon" viewBox="0 0 24 24" aria-hidden="true">
+          <path d="M20 4v6h-6m6 0a8 8 0 1 0 0 5" />
+        </svg>Refresh route</button>
       </div>
       <p className="sr-only" role="status">{announcement} {direction}</p>
       <footer><strong>Simulation only.</strong> Follow official alarms and emergency personnel.</footer>

@@ -21,3 +21,18 @@ test("default forecast explicitly identifies modeled unaffected zones", () => {
   assert.equal(arrivalTimes('smoke', 10)['east-hall'], 35);
   assert.equal(arrivalTimes('fire', 0, { events: [] }).gallery, undefined);
 });
+
+test('invalid forecast events never become an explicitly unaffected zone', () => {
+  for (const afterSeconds of [-1, NaN, Infinity, '25']) {
+    const deadlines = arrivalTimes('smoke', 0, {
+      modeledZones: ['east-hall', 'gallery'],
+      events: [afterSeconds, 25].map(value => ({
+        scenario: 'smoke', kind: 'smoke', zone: 'east-hall', afterSeconds: value,
+      })),
+    });
+    assert.equal(deadlines['east-hall'], undefined);
+    assert.equal(deadlines.gallery, null);
+  }
+  assert.deepEqual(arrivalTimes('smoke', NaN), {});
+  assert.deepEqual(arrivalTimes('smoke', 0, { modeledZones: ['gallery'] }), {});
+});

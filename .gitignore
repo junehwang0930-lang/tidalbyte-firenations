@@ -1,0 +1,29 @@
+# Dependencies and Python environments
+node_modules/
+.venv/
+venv/
+__pycache__/
+*.py[cod]
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+.coverage
+htmlcov/
+*.egg-info/
+# Generated frontend/build artifacts
+dist/
+build/
+*.tsbuildinfo
+coverage/
+# Secrets and local configuration
+.env
+.env.*
+!.env.example
+*.pem
+*.key
+# Editor/OS files and logs
+.idea/
+.vscode/
+.DS_Store
+Thumbs.db
+*.log

@@ -1,3 +1,5 @@
 # Fire Nations coding instructions
 
 Read and follow the root `AGENTS.md` before beginning any task. It defines the shared architecture, simulated-data contract, feature branch ownership, testing expectations, and simulation-only safety limitations. Keep changes within the assigned module; coordinate shared types and dependencies before editing them. Preserve existing teammate changes, never force-push, and use fictional test fixtures unless an approved map is available.
+
+Follow AGENTS.md's end-of-task sharing checklist: validate, commit only the task's changes, push the assigned feature branch, and open or update its PR into `main` without waiting for a separate sharing request. Use a draft PR for unfinished work. Do not commit or push directly to `main`, merge automatically, or include unrelated work. Honor explicit task-specific sharing restrictions and report authentication or permission blockers honestly. Include the commit SHA, PR URL, and validation results in the final response.

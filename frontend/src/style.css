@@ -153,7 +153,9 @@ footer strong { color: #ffae98; }
 .camera-layout:not(.camera-layout-expanded) .camera-lane { height: 34%; transform: translateY(3%); }
 .camera-layout:not(.camera-layout-expanded) .camera-lane-west { transform: translate(-8%, 3%) skewX(14deg); }
 @media (max-height: 490px) and (orientation: landscape) {
-  .camera-layout:not(.camera-layout-expanded) { grid-template-rows: minmax(0, 2fr) minmax(0, 3fr); }
+  .camera-layout:not(.camera-layout-expanded) {
+    grid-template-rows: minmax(0, 2fr) minmax(min-content, 3fr);
+  }
   .camera-frame { gap: 2px; padding-bottom: 4px; }
   .camera-handle { flex-basis: 24px; }
   .camera-dock { gap: 2px; }

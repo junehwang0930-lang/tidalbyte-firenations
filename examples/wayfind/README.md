@@ -1,6 +1,34 @@
 # Wayfind prototype
 This directory preserves the original hackathon prototype for reference during the team's FastAPI integration. Combine the three feature branches to run the full demo. Frontend owns the browser UI, hazard simulation owns the incident server and forecasts, and pathfinding owns the training graph and route search.
 
+This example is not the implementation of the shared FastAPI/Pydantic modules.
+The shared application remains in root `frontend/` and `backend/`. Its contract
+is unchanged. Review the three example PRs together; do not treat one branch as
+a standalone runnable demo. To test their combination without merging into main:
+
+```sh
+git fetch origin
+git switch -c integration/wayfind-review origin/main
+git merge origin/feature/pathfinding origin/feature/hazard-simulation origin/feature/map-frontend
+cd examples/wayfind
+npm ci
+npm test
+npm run build
+npm start
+```
+
+Run those commands from a clean checkout, preserving unrelated work. The local
+integration branch is for testing; each feature PR still receives its own review.
+Routing unit tests are self-contained and can run on their own branch with
+`node --test examples/wayfind/test/model.test.js` from the repository root.
+
+The prototype's deadline contract is intentionally separate from shared risk
+scores: an explicit `null` deadline means this fictional scenario models no
+hazard arrival; a missing zone is unknown and excluded from routing. Numeric
+deadlines must be finite and nonnegative. Shared `HazardSnapshot` null risk
+scores still mean unknown. Server snapshots include a per-process `sessionId`
+so reset sequence numbers after a restart do not strand connected clients.
+
 From this directory run `npm ci`, `npm run build`, then `npm start`. Use Node.js 22.12+ or 24. The occupant page is http://localhost:4173 and the presenter page is http://localhost:4173/presenter. Build the presenter before using either system launcher.
 
 ## One-minute demo

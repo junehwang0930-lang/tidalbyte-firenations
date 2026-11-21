@@ -10,7 +10,7 @@
     "build": "vite build && node --check server.js && node --check public/app.js"
   },
   "engines": {
-    "node": ">=20"
+    "node": ">=22.12.0"
   },
   "dependencies": {
     "react": "^19.3.1",

@@ -1,4 +1,5 @@
-import { nodes, edges, metres, plan, signedAngle } from "./model.js";
+import { nodes, edges, metres, plan, signedAngle, canTraverse } from "./model.js";
+import { createSnapshotGate, connectIncidentFeed } from "./connection.js";
 import { incident } from "./forecast.js";
 import { mapMarkup, icon } from "./map.js";
 import { referenceMap } from "./reference.js";
@@ -94,15 +95,10 @@ async function refresh() {
   if (!r.ok) throw Error();
   accept(await r.json());
 }
+const acceptSnapshot = createSnapshotGate();
 function accept(s) {
-  if (
-    s.epoch < state.epoch ||
-    (s.epoch === state.epoch &&
-      (s.seq < state.seq ||
-        (s.seq === state.seq && s.timestamp < state.timestamp)))
-  )
-    return;
-  if (s.epoch !== state.epoch) {
+  if (!acceptSnapshot(s)) return;
+  if (s.sessionId !== state.sessionId || s.epoch !== state.epoch) {
     if (source === "Demo walker") resetPosition();
     lastRoute = "";
     notice = "";
@@ -154,11 +150,7 @@ function currentRoute() {
       candidates = [];
     for (const id of [node, next]) {
       const d = metres(pos, nodes[id]);
-      if (
-        hazard.closed.includes(zone) ||
-        state.t + d / 1.25 + 5 >= (hazard.deadlines[zone] ?? Infinity)
-      )
-        continue;
+      if (!canTraverse(zone, state.t + d / 1.25, hazard)) continue;
       const tail = plan(id, state.t + d / 1.25, hazard);
       if (tail)
         candidates.push({
@@ -746,18 +738,16 @@ document.addEventListener("click", (e) => {
 dialog.addEventListener("close", () => {
   dialog.dataset.mode = "";
 });
-const events = new EventSource("/api/events");
-events.onmessage = (e) => {
-  try {
-    accept(JSON.parse(e.data));
-  } catch {
-    err();
-  }
-};
-events.onerror = () => {
-  connected = false;
-  render();
-};
+connectIncidentFeed({
+  onSnapshot: accept,
+  onError: () => { connected = false; render(); },
+  onSuspend: () => {
+    connected = false;
+    stopGeo();
+    if (inCamera) stopCamera();
+  },
+  onResume: () => { frameTime = performance.now(); refresh().catch(err); },
+});
 refresh().catch(err);
 setInterval(() => {
   if (presenter) return;
@@ -778,8 +768,3 @@ setInterval(() => {
     shownAt = now;
   }
 }, 100);
-window.addEventListener("pagehide", () => {
-  events.close();
-  stopGeo();
-  if (inCamera) stopCamera();
-});

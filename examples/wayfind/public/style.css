@@ -1,0 +1,622 @@
+* {
+  box-sizing: border-box;
+}
+html {
+  color-scheme: dark;
+}
+body {
+  margin: 0;
+  background: #10161c;
+  color: #f3f5f7;
+  font-family:
+    Inter,
+    -apple-system,
+    BlinkMacSystemFont,
+    "Segoe UI",
+    sans-serif;
+}
+button,
+a {
+  font: inherit;
+}
+button,
+.linkbtn {
+  background: #25303a;
+  color: #f4f6fa;
+  border: 1px solid #45515c;
+  border-radius: 12px;
+  min-height: 44px;
+  padding: 0 14px;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  font-weight: 600;
+  text-decoration: none;
+}
+button:hover,
+.linkbtn:hover {
+  background: #35424f;
+}
+button:focus-visible,
+a:focus-visible {
+  outline: 3px solid #72b8ff;
+}
+button svg {
+  flex: none;
+}
+.round {
+  width: 44px;
+  padding: 0;
+  border-radius: 50%;
+}
+.shell {
+  height: 100dvh;
+  min-height: 520px;
+  display: flex;
+  flex-direction: column;
+}
+.top {
+  height: 65px;
+  flex: none;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 clamp(16px, 4vw, 64px);
+  border-bottom: 1px solid #35404a;
+  background: #141b22;
+}
+.brand,
+.row,
+.right,
+.group {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+.brand {
+  font-size: 21px;
+  font-weight: 730;
+  letter-spacing: -1px;
+}
+.brandmark {
+  width: 32px;
+  height: 32px;
+  background: #dcecc1;
+  color: #182519;
+  display: grid;
+  place-items: center;
+  border-radius: 10px;
+}
+.brandmark svg {
+  width: 23px;
+}
+.sim,
+.chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  font-size: 11px;
+  font-weight: 650;
+  letter-spacing: 0.04em;
+  border: 1px solid #49523e;
+  border-radius: 24px;
+  background: #252e24;
+  color: #d3eab0;
+  padding: 5px 10px;
+}
+.sim:before {
+  content: "";
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: #c0e78c;
+}
+.stage {
+  flex: 1;
+  min-height: 0;
+  position: relative;
+  overflow: hidden;
+  background-color: #151d25;
+  background-image: radial-gradient(#34414d 1px, transparent 1px);
+  background-size: 16px 16px;
+}
+.head {
+  position: absolute;
+  z-index: 2;
+  inset: 20px clamp(16px, 4vw, 64px) auto;
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  pointer-events: none;
+}
+.head > * {
+  pointer-events: auto;
+}
+h1,
+h2,
+p {
+  margin: 0;
+}
+.head h1 {
+  font-size: clamp(19px, 2.3vw, 32px);
+  letter-spacing: -0.05em;
+}
+.sub {
+  color: #b3bec9;
+  font-size: 13px;
+  margin-top: 4px;
+}
+.floor {
+  display: flex;
+  padding: 3px;
+  border: 1px solid #45515b;
+  background: #19222be8;
+  border-radius: 13px;
+}
+.floor button {
+  padding: 0;
+  min-width: 44px;
+  min-height: 44px;
+  background: transparent;
+  border: none;
+  font-size: 12px;
+}
+.floor .sel {
+  color: #142232;
+  background: #c5d9ed;
+}
+.field {
+  position: absolute;
+  inset: 92px 9% 126px;
+  touch-action: none;
+  display: grid;
+  place-items: center;
+}
+.drawing {
+  width: 100%;
+  height: 100%;
+  overflow: visible;
+}
+.slab {
+  fill: #303b47;
+  stroke: #83909b;
+  stroke-width: 2;
+}
+.room {
+  fill: #252f39;
+  stroke: #8996a3;
+  stroke-width: 1.25;
+}
+.door,
+.draft {
+  fill: none;
+  stroke: #788591;
+  stroke-width: 0.7;
+}
+.draft {
+  opacity: 0.8;
+}
+.roomlabel,
+.halllabel,
+.exitlabel {
+  font-family: inherit;
+  text-anchor: middle;
+  fill: #c6cfd8;
+  font-size: 8px;
+  font-weight: 550;
+}
+.halllabel {
+  font-size: 4px;
+  letter-spacing: 1.1px;
+  fill: #bdcbd5;
+}
+.exitlabel {
+  fill: #c0f0d7;
+  font-weight: 700;
+  paint-order: stroke;
+  stroke: #28343d;
+  stroke-width: 3;
+}
+.route,
+.pathcase {
+  fill: none;
+  stroke: #419aff;
+  stroke-width: 5;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+.pathcase {
+  stroke: #162b45;
+  stroke-width: 8;
+}
+.tools {
+  position: absolute;
+  bottom: 116px;
+  right: clamp(16px, 4vw, 64px);
+  display: grid;
+  gap: 7px;
+}
+.tools button,
+.secondary {
+  background: #1c2630ed;
+}
+.legend {
+  position: absolute;
+  bottom: 116px;
+  left: clamp(16px, 4vw, 64px);
+  font-size: 11px;
+  color: #bac6cf;
+  display: flex;
+  gap: 12px;
+}
+.legend span:before {
+  content: "";
+  display: inline-block;
+  width: 9px;
+  height: 9px;
+  border-radius: 3px;
+  background: #4b9dff;
+  margin-right: 5px;
+}
+.legend span + span:before {
+  background: #f08751;
+}
+.dock {
+  position: absolute;
+  bottom: 15px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: min(92%, 680px);
+  background: #1b252ef5;
+  border: 1px solid #495763;
+  border-radius: 18px;
+  padding: 16px;
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  box-shadow: 0 10px 28px #0005;
+}
+.maneuver {
+  width: 49px;
+  height: 49px;
+  flex: none;
+  background: #283f56;
+  color: #88c5ff;
+  display: grid;
+  place-items: center;
+  border-radius: 13px;
+}
+.dock h2 {
+  font-size: clamp(18px, 2vw, 25px);
+  letter-spacing: -0.04em;
+}
+.dock small,
+.muted {
+  color: #b7c1ca;
+}
+.dock .action {
+  margin-left: auto;
+  white-space: nowrap;
+}
+.primary {
+  color: #102110;
+  background: #d7ebb8;
+  border-color: #d7ebb8;
+}
+.primary:hover {
+  background: #e4f4cf;
+}
+.foot {
+  padding: 7px clamp(16px, 4vw, 64px) max(7px, env(safe-area-inset-bottom));
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  background: #151d24;
+  border-top: 1px solid #33404c;
+  font-size: 12px;
+}
+.foot button {
+  background: transparent;
+  border: 0;
+  color: #ffae97;
+  padding: 0 5px;
+}
+.status {
+  display: flex;
+  gap: 6px;
+  align-items: center;
+  color: #bfcad4;
+}
+.status:before {
+  content: "";
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: #74b9ff;
+}
+.nomap {
+  text-align: center;
+  max-width: 300px;
+}
+.nomap p {
+  color: #b7c1ca;
+  padding: 10px;
+}
+.camera {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(150deg, #27333d, #0b0f13);
+  z-index: 4;
+}
+.camera video {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+.camtop,
+.cammsg,
+.minimap,
+.back {
+  position: absolute;
+}
+.camtop {
+  top: 15px;
+  left: 15px;
+  right: 15px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+.cammsg {
+  top: 28%;
+  left: 50%;
+  transform: translateX(-50%);
+  text-align: center;
+  background: #17212bea;
+  padding: 14px;
+  border-radius: 16px;
+  min-width: 190px;
+}
+.cammsg p {
+  margin-top: 6px;
+  font-size: 13px;
+}
+.arrow {
+  display: block;
+  color: #b4dcff;
+  font-size: 70px;
+  line-height: 1.2;
+}
+.minimap {
+  bottom: 112px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: min(90%, 440px);
+  height: 125px;
+  border: 1px solid #586570;
+  border-radius: 16px;
+  background: #18212bec;
+  overflow: hidden;
+}
+.camera .dock {
+  z-index: 1;
+}
+.back {
+  top: 75px;
+  left: 16px;
+}
+.hidden,
+[hidden] {
+  display: none !important;
+}
+dialog {
+  width: min(94vw, 425px);
+  border: 1px solid #56626d;
+  border-radius: 20px;
+  background: #1c2630;
+  color: inherit;
+  box-shadow: 0 15px 50px #0008;
+  padding: 23px;
+}
+dialog::backdrop {
+  background: #080d14b8;
+  backdrop-filter: blur(4px);
+}
+dialog h2 {
+  letter-spacing: -0.03em;
+  margin-bottom: 12px;
+}
+dialog p,
+.present p {
+  color: #c0c9d3;
+  line-height: 1.55;
+  font-size: 14px;
+}
+dialog button,
+dialog a {
+  margin: 5px 5px 0 0;
+}
+dialog .actions {
+  margin-top: 15px;
+}
+a {
+  color: #9acbff;
+}
+.present {
+  max-width: 680px;
+  margin: 38px auto;
+  padding: 0 20px;
+}
+.present h1 {
+  letter-spacing: -0.05em;
+  margin: 12px 0;
+}
+.panel {
+  background: #1c2630;
+  border: 1px solid #3c4a56;
+  border-radius: 16px;
+  padding: 18px;
+  margin: 14px 0;
+}
+.panel h2 {
+  font-size: 17px;
+  margin-bottom: 9px;
+}
+.panel button {
+  margin: 4px;
+}
+.panel img {
+  border-radius: 8px;
+}
+.panel small {
+  display: block;
+  margin: 6px;
+  color: #c3cbd2;
+}
+.banner {
+  position: absolute;
+  top: 83px;
+  left: 50%;
+  transform: translateX(-50%);
+  border-radius: 18px;
+  background: #202b34;
+  padding: 6px 11px;
+  font-size: 12px;
+  border: 1px solid #52606c;
+  z-index: 2;
+}
+.banner:empty {
+  display: none;
+}
+#toast {
+  position: fixed;
+  z-index: 10;
+  bottom: 28%;
+  left: 50%;
+  transform: translateX(-50%);
+  background: #e4ebf1;
+  color: #15212d;
+  padding: 8px 14px;
+  border-radius: 18px;
+  font-size: 13px;
+  text-align: center;
+  pointer-events: none;
+}
+#toast:empty {
+  display: none;
+}
+.miniinfo {
+  font-size: 11px;
+  color: #c3d2df;
+}
+.qr {
+  width: 120px;
+  height: 120px;
+}
+@media (max-width: 640px) {
+  .top {
+    height: 55px;
+    padding: 0 14px;
+  }
+  .brand {
+    font-size: 19px;
+  }
+  .head {
+    inset: 17px 12px auto;
+    gap: 6px;
+  }
+  .head h1 {
+    font-size: 19px;
+    max-width: 200px;
+  }
+  .sub {
+    font-size: 11px;
+  }
+  .field {
+    inset: 82px 5px 175px;
+  }
+  .tools {
+    bottom: 119px;
+    right: 13px;
+    display: flex;
+  }
+  .legend {
+    bottom: 131px;
+    left: 14px;
+    gap: 8px;
+  }
+  .dock {
+    width: calc(100% - 24px);
+    padding: 12px;
+    gap: 9px;
+    bottom: 12px;
+    min-height: 83px;
+  }
+  .dock small {
+    font-size: 11px;
+  }
+  .dock .action {
+    padding: 0 10px;
+  }
+  .maneuver {
+    width: 36px;
+    height: 42px;
+  }
+  .floor button {
+    min-width: 44px;
+  }
+  .foot {
+    padding-inline: 13px;
+  }
+  .banner {
+    top: 76px;
+    max-width: 93%;
+    width: max-content;
+  }
+  .camera .dock {
+    min-height: 65px;
+  }
+  .minimap {
+    bottom: 90px;
+  }
+  .head .sub {
+    max-width: 170px;
+  }
+  .roomlabel {
+    font-size: 9px;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  * {
+    scroll-behavior: auto !important;
+  }
+}
+.foot button[data-act="toggle"] {
+  color: #c8deaf;
+}
+.cammsg {
+  top: 82px;
+}
+.cammsg:has(.arrow:not([hidden])) {
+  top: 16%;
+  background: transparent;
+}
+.cammsg:has(.arrow:not([hidden])) h2,
+.cammsg:has(.arrow:not([hidden])) #camdetail {
+  background: #18232cef;
+  padding: 5px 12px;
+}
+.cammsg .arrow {
+  margin-top: 10vh;
+  text-shadow: 0 2px 12px #172533;
+}
+.head h1 {
+  line-height: 1.07;
+}
+.roomlabel {
+  paint-order: stroke;
+  stroke: #252f39;
+  stroke-width: 0.7;
+}

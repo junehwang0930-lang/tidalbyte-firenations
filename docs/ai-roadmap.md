@@ -29,6 +29,11 @@ the same interface without rewriting estimation, prediction, routing, or
 visualization. Keep layouts, graph connections, and detector placements in
 configuration consumed by the algorithms.
 
+Test that boundary by replaying equivalent normalized readings through the
+virtual provider and a test adapter. With the same layout, initial state, and
+event timing, both must produce the same hazard estimates, forecasts, and
+routes. Only the provider should know how a reading was obtained.
+
 | Data | Meaning |
 | --- | --- |
 | Observed detector reading | What a detector reports at a timestamp, including its reported status. In the demo, the provider generates these readings. |
@@ -61,8 +66,10 @@ when the evidence is insufficient.
    to train Random Forest regression models for area-level fire and smoke
    risk 30 and 60 seconds after the forecast issue time. Generate examples
    from synthetic scenarios using detector activation histories and other
-   features available at the issue time. Use later simulator scores only as
-   labels. Split by scenario before making time windows and group related
+   features available at the issue time. Use the same feature computation in
+   training and live inference. Use later simulator scores only as labels
+   and exclude simulator state that a deployed estimator could not observe
+   or derive. Split by scenario before making time windows and group related
    runs together. Fit preprocessing and tune only on training scenarios,
    then evaluate on unseen scenarios. Report actual mean absolute error
    and forecast coverage for each hazard and horizon on comparable examples,
@@ -85,7 +92,9 @@ when the evidence is insufficient.
 6. **End-to-end testing and hackathon demonstration.** Run a scenario from
    virtual detector events through estimation, forecast, Dijkstra, and both
    views. Vary incoming events to verify that a route changes because of
-   computed hazard scores. Exercise blocked routes, missing and conflicting
+   computed hazard scores. Verify that both clients display the route
+   returned by Dijkstra for the same snapshot as the displayed hazards.
+   Exercise blocked routes, missing and conflicting
    readings, and unavailable forecasts. Report measured evaluation results
    and demonstrate the limits of the fictional scenario.
 

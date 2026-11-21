@@ -10,6 +10,8 @@ Build a predictive evacuation system designed for eventual authorized building u
 
 The [machine learning roadmap](docs/ai-roadmap.md) defines six phases. Keep the detector data provider replaceable and configure building layouts and detector locations independently of the algorithms. The demo uses computed results from virtual detector events through web and mobile visualization. Hardcoded results and scripted animations do not satisfy the demo requirements.
 
+Test the provider boundary with equivalent normalized events from two providers. Downstream algorithms should yield equivalent results for the same inputs. Handle missing, offline, stale, invalid, and contradictory readings explicitly. Preserve unknown hazard scores when evidence is insufficient, and never treat a normal reading as proof of safety.
+
 MVP: interactive 2D floorplan, simulated user location, simulated fire/smoke and blocked pathways, hazard visualization, multiple simulated exit candidates, risk-weighted routing and automatic rerouting, no-route handling, and simulation controls. Future: verified building data, approved integration with fire alarm/access-control systems and indoor positioning, CFAST/FDS-based validated modeling, accessibility support based on verified building plans, firefighter dashboard, AR/3D, and campus app integration. Do not connect to or modify any real building life-safety system.
 
 ## Shared project setup

@@ -5,6 +5,9 @@ authorized building data. The virtual detector network is the demo's primary
 mocked external data source. The planned algorithms use configurable layouts
 and detector placements to compute hazard estimates, forecasts, and routes.
 The demo requires live computed outputs in the web and mobile views.
+As detector readings change, both views should show the resulting hazard
+estimates, forecasts, and routes. The existing sample routes are placeholders
+until that integration is complete.
 
 See the [six-phase machine learning roadmap](docs/ai-roadmap.md) for the
 replaceable detector interface, graph-based propagation, Python and scikit-learn

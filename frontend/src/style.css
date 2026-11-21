@@ -29,7 +29,8 @@ h2 { margin: 0; font-size: 1.1rem; }
 .icon { width: 20px; height: 20px; fill: none; stroke: currentColor; stroke-width: 1.7; stroke-linecap: round; stroke-linejoin: round; flex-shrink: 0; }
 .expand { position: absolute; right: 12px; top: 8px; }
 .floor-map { width: 100%; height: auto; display: block; }
-.rooms { fill: #e8d9cb; stroke: #483538; stroke-width: 2; }
+.rooms { fill: #e8d9cb; }
+.room-outline { fill: none; stroke: #483538; stroke-width: 2; }
 .hall { fill: #fffaf0; }
 .walls { fill: none; stroke: #483538; stroke-width: 1.5; }
 .map-labels { fill: #412d2f; font-size: 8px; font-weight: 600; text-anchor: middle; }

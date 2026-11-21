@@ -44,6 +44,9 @@ export default function FloorMap({ floor, route, radius, fire }: {
         </radialGradient>
       </defs>
       <rect className="rooms" x="0" y="0" width="280" height="157" />
+      <path className="room-outline" d={floor === 1
+        ? 'M0 84V0H280V84M0 116V157H280V116'
+        : 'M0 0H280V157H0Z'} />
       <rect className="hall" x="1" y={floor === 1 ? 84 : floor === 2 ? 65 : 77}
         width="278" height={floor === 1 ? 32 : 34} />
       <path className="walls" d={plan.walls} />

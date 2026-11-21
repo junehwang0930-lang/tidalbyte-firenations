@@ -31,6 +31,9 @@ export default function App() {
   const hasRoute = connected && graph.exitNodeIds.includes(routeIds[routeIds.length - 1]);
   const direction = hasRoute ? (phase === 0 ? 'East exit' : 'West exit') : '';
   const floorHasScenario = floor === 1;
+  const routeStatus = floorHasScenario
+    ? direction || 'No demo route available'
+    : `No demo route on Floor ${floor}. Routing demo on Floor 1.`;
   const map = <FloorMap floor={floor} route={floorHasScenario && hasRoute ? route : []}
     radius={phase === 0 ? 47 : 72}
     fire={floorHasScenario ? nodes.get(phase === 0 ? 'room-a' : 'hall-east') : undefined} />;
@@ -57,7 +60,7 @@ export default function App() {
 
   function refreshRoute() {
     setSnapshot(snapshot + 1);
-    setAnnouncement(`Demo route refreshed for snapshot ${snapshot + 2}.`);
+    setAnnouncement(`Floor 1 demo route refreshed for snapshot ${snapshot + 2}.`);
   }
 
   function closeCamera() {
@@ -87,7 +90,7 @@ export default function App() {
         <svg className="route-icon icon" viewBox="0 0 24 24" aria-hidden="true">
           <path d="M5 20v-9a3 3 0 0 1 3-3h11m-4-4 4 4-4 4" />
         </svg>
-        <div><small>Simulated route</small><strong>{floorHasScenario ? (direction || 'No demo route available') : 'Routing demo on Floor 1'}</strong></div>
+        <div><small>Simulated route</small><strong>{routeStatus}</strong></div>
         <span className="snapshot">Snapshot {snapshot + 1}</span>
       </section>
       <div className="actions">
@@ -98,7 +101,7 @@ export default function App() {
           <path d="M20 4v6h-6m6 0a8 8 0 1 0 0 5" />
         </svg>Refresh route</button>
       </div>
-      <p className="sr-only" role="status">{announcement} {direction}</p>
+      <p className="sr-only" role="status">{announcement} {routeStatus}</p>
       <footer><strong>Simulation only.</strong> Follow official alarms and emergency personnel.</footer>
       <dialog className="overlay fullscreen" ref={mapDialog} aria-labelledby="map-title">
         <header className="dialog-header"><h2 id="map-title" className="sr-only">Full-screen floor plan</h2>{floorPicker}

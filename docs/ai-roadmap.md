@@ -1,86 +1,106 @@
-# Fire Nations machine learning roadmap
+# Fire Nations predictive evacuation roadmap
 
-Fire Nations is a hackathon simulation using fictional floor plans and virtual
-detectors. Its route suggestions illustrate how changing hazards can affect
-route choice. Official alarms and emergency personnel supersede the demo.
+Fire Nations is designed as a predictive evacuation system for eventual use
+with authorized building data. **Simulation only.** The hackathon prototype
+uses a fictional building and virtual detectors because the project has no
+authorized access to live fire alarm data. Official alarms and emergency
+personnel supersede any prototype suggestion.
 
 ## Architecture
 
-Virtual detector network → simulated detector events → fire/smoke simulation →
-synthetic training dataset → Random Forest prediction → risk-weighted Dijkstra →
-frontend and mobile visualization.
+The detector network is the primary mocked external data source. The demo
+must run functional, tested downstream algorithms for event processing,
+current hazard estimation, graph-based propagation, model inference, and
+routing. The web and mobile interfaces must render those outputs as inputs
+change. Hardcoded routes and scripted animations are placeholders during
+development and do not satisfy the end-to-end demo.
 
-Dataset generation, training, and evaluation run offline. During the demo, the
-simulator supplies current estimates and the trained model supplies forecasts
-from information available at the current simulation tick. The demo does not
-train a model while routing.
+- **Live demo:** Detector provider → event processing and activation history →
+  current fire and smoke estimates → Random Forest forecasts → current and
+  forecast risk integration → risk-weighted Dijkstra → web and mobile updates.
+- **Offline training:** Graph-based fire and smoke simulation → synthetic
+  detector histories and hazard targets → feature generation → Random Forest
+  training and evaluation → model used for live inference.
 
-Each layer keeps its own meaning for the data.
+The replaceable provider supplies detector ID, status, configured location or
+area ID, and timestamp. Event processing validates those records and maintains
+activation history. A future authorized provider can normalize its input to
+the same interface without rewriting estimation, prediction, routing, or
+visualization. Keep layouts, graph connections, and detector placements in
+configuration consumed by the algorithms.
 
 | Data | Meaning |
 | --- | --- |
-| Observed detector signal | A reading or alarm reported by a virtual detector at a specific simulated time. A normal reading reflects only that detector's report. |
-| Estimated current hazard | The simulator's current area-level fire and smoke scores, with unknown values preserved when information is insufficient. |
-| Predicted hazard | A model estimate for an area at a specified future simulated time, associated with the tick when the forecast was issued. |
+| Observed detector reading | What a detector reports at a timestamp, including its reported status. In the demo, the provider generates these readings. |
+| Estimated current hazard | The estimator's current area-level fire and smoke scores derived from valid observations, event history, and graph-based propagation. |
+| Predicted future hazard | A model estimate for an area at a particular horizon, associated with the timestamp when the forecast was issued. |
 
-Missing, stale, or normal detector readings are never proof of safety. Only
-represent zero risk when it is a known illustrative score under the simulation
-rules. Keep observed signals, current estimates, and forecasts distinguishable
-through routing and visualization.
+Handle missing, offline, stale, invalid, and contradictory readings explicitly.
+Keep missing detectors distinct from reported offline status. Flag stale
+readings, reject malformed records, and surface unresolved contradictions as
+uncertainty. A normal reading describes a single detector report. Normal or
+missing readings never prove an area is safe. Preserve unknown hazard scores
+when the evidence is insufficient.
 
 ## Development phases
 
-1. **Detector registry and event history.** Give each virtual detector a stable
-   ID, detector type, and graph area ID. Emit timestamped simulated alarm and
-   clear events and retain activation history. Distinguish a normal reading
-   from missing or stale data. Define a provider interface for the registry and
-   events that is independent of the model and simulator implementation. A
-   future authorized sensor adapter could emit the same input through this
-   interface. The hackathon demo uses the virtual provider exclusively.
-2. **Graph-based fire and smoke simulation.** Run configurable, reproducible
-   scenarios on the fictional building graph. Vary the starting area, timing,
-   propagation settings, and detector availability. Track fire and smoke
-   separately across explicitly modeled connections. Emit current
-   `HazardSnapshot` values and explicitly record blocked edge IDs. Keep
-   simulator rules illustrative and preserve unknown values.
-3. **Synthetic training dataset.** Generate reproducible runs and label each
-   row by scenario, area, and simulated tick. Build features from detector
-   history and available simulation estimates through that tick. Use the
-   simulator's later area scores as targets at 30 and 60 simulated seconds.
-   Keep unavailable targets out of the corresponding training or evaluation
-   task and record the scenario configuration and seed for reproducibility.
-4. **Random Forest regression.** Forecast area-level fire and smoke risk at
-   both horizons. Return illustrative scores in `[0, 1]` and identify the issue
-   tick and target tick. Preserve unavailable forecasts as unknown. Train
-   offline and use the trained model for inference during the demo.
-5. **Model evaluation.** Assign entire scenarios to separate training and
-   held-out test sets before generating time windows. Keep runs derived from
-   the same scenario together. Tune on training scenarios only using
-   scenario-grouped validation. Compute rolling features using data at or
-   before the issue tick, keep future simulator values in the targets, and fit
-   any preprocessing on training data only. Compare mean absolute error and
-   forecast coverage by hazard and horizon using the same held-out examples
-   for the model and a non-ML persistence baseline that carries the current
-   estimate forward. Report performance on changing hazards separately from
-   steady periods. Performance on synthetic data only measures how well the
-   model generalizes across the tested simulations.
-6. **Risk-weighted route integration.** Use a routing adapter to combine
-   current and forecast area scores into the single `HazardSnapshot` consumed
-   by the existing Dijkstra engine. Document the horizon selection and
-   combination policy before implementation. A lower forecast must never
-   reduce a known current score, and forecasts must never reopen a blocked
-   edge or turn an unknown current score into a known one. With unavailable
-   forecasts, retain current-only routing and its existing no-route behavior.
-   Preserve `BuildingGraph`, `HazardSnapshot`, `UserLocation`, and
-   `RouteResult` and coordinate any additional forecast metadata separately.
-7. **Live visualization and hackathon demo.** Update the React frontend and
-   its MAUI mobile shell as simulated time advances. Label detector events,
-   current hazard estimates, and forecasts at each horizon. Show the simulated
-   location, route changes, and no-route or unavailable data states. Rehearse
-   a fictional scenario with a detector activation, a changing route, and a
-   blocked or unknown segment. Keep the simulation-only notice visible.
+1. **Detector registry, provider, and event history.** Define the provider
+   interface and implement the virtual detector provider. Map stable detector
+   IDs to configured locations, validate incoming statuses and timestamps, and
+   record alarm activations and clears. Test event replay, invalid records,
+   missing and offline detectors, stale readings, and contradictory reports.
+2. **Current hazard estimation and propagation.** Estimate current fire and
+   smoke risk from observations and activation history. Implement separate
+   graph-based fire and smoke propagation models across configured
+   connections. Emit current `HazardSnapshot` values and explicitly record
+   blocked edges. Use the same simulation engine to generate reproducible
+   scenarios by varying ignition area, timing, propagation settings, and
+   detector availability. The propagation models are simplified and require
+   empirical validation for real-world use.
+3. **Dataset, features, training, and evaluation.** Use Python and scikit-learn
+   to train Random Forest regression models for area-level fire and smoke
+   risk 30 and 60 seconds after the forecast issue time. Generate examples
+   from synthetic scenarios using detector activation histories and other
+   features available at the issue time. Use later simulator scores only as
+   labels. Split by scenario before making time windows and group related
+   runs together. Fit preprocessing and tune only on training scenarios,
+   then evaluate on unseen scenarios. Report actual mean absolute error
+   and forecast coverage for each hazard and horizon on comparable examples,
+   alongside non-ML baselines such as persistence and simulator-only
+   extrapolation. Document configurations, seeds, coverage gaps, and
+   limitations. Synthetic-data performance measures performance on those
+   simulations and cannot establish real-world predictive accuracy.
+4. **Forecast integration and automatic rerouting.** Combine current and
+   forecast hazard scores in a routing adapter for the existing Dijkstra
+   engine. Specify how the adapter selects horizons and combines scores.
+   Preserve current blocked edges and unknown current scores. Lower
+   forecasts cannot reduce known current risk. Use current-only routing when
+   forecasts are unavailable. Recompute routes when detector updates change
+   hazard estimates or forecasts, and preserve explicit no-route handling.
+5. **Real-time frontend and mobile integration.** Update the React web app and
+   MAUI mobile shell from the same computed results. Label detector readings,
+   current estimates, and time-stamped forecasts separately. Show reroutes and
+   unavailable or no-route states as data changes, with a visible
+   simulation-only notice.
+6. **End-to-end testing and hackathon demonstration.** Run a scenario from
+   virtual detector events through estimation, forecast, Dijkstra, and both
+   views. Vary incoming events to verify that a route changes because of
+   computed hazard scores. Exercise blocked routes, missing and conflicting
+   readings, and unavailable forecasts. Report measured evaluation results
+   and demonstrate the limits of the fictional scenario.
 
-The existing [pathfinding engine](../backend/app/pathfinding/README.md) is
-available as a pure Python function. Live simulation, forecasting, and API
-integration are planned. Follow the existing ownership, shared contracts, and
-review workflow in [AGENTS.md](../AGENTS.md).
+Preserve the existing `BuildingGraph`, `HazardSnapshot`, `UserLocation`, and
+`RouteResult` contracts. Coordinate any new detector or forecast metadata
+separately under the existing ownership and review process.
+
+## Current implementation and deployment prerequisites
+
+The [pathfinding engine](../backend/app/pathfinding/README.md) is already
+available as a standalone Python function. The current web and mobile demo
+uses sample routes. Detector processing, propagation, model training, and
+live routing integration are planned.
+
+Future deployment requires verified building layouts, approved detector
+locations, authorized sensor access, reliable indoor positioning, empirical
+validation, and applicable life-safety review. Follow [AGENTS.md](../AGENTS.md)
+for the existing shared contracts, ownership, and Git workflow.

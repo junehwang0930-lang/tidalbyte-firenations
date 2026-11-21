@@ -1,9 +1,15 @@
 # Fire Nations — TidalHack
 
-Shared hackathon foundation: React + TypeScript + Vite, Python + FastAPI + Pydantic,
-Pytest, and HTTP/JSON. Read [AGENTS.md](AGENTS.md) before changing shared files.
-See the [machine learning roadmap](docs/ai-roadmap.md) for the planned detector,
-simulation, forecasting, routing, and visualization phases.
+Fire Nations is a predictive evacuation project designed for eventual use with
+authorized building data. The virtual detector network is the demo's primary
+mocked external data source. The planned algorithms use configurable layouts
+and detector placements to compute hazard estimates, forecasts, and routes.
+The demo requires live computed outputs in the web and mobile views.
+
+See the [six-phase machine learning roadmap](docs/ai-roadmap.md) for the
+replaceable detector interface, graph-based propagation, Python and scikit-learn
+Random Forest forecasts, and evaluation against non-ML baselines. Follow
+[AGENTS.md](AGENTS.md) when changing shared files.
 
 **Simulation only.** The building is fictional, not an approved MSC map. This is
 not a validated emergency navigation system. Official alarms and emergency
@@ -132,7 +138,8 @@ MobileApp/                 # MAUI shell bundling the shared frontend
 The backend implements risk-weighted Dijkstra as a standalone Python function.
 FastAPI serves health and graph endpoints, and the frontend uses sample routes.
 The [MAUI shell](MobileApp/README.md) bundles the frontend for offline demos.
-The hazard simulator, model, and routing API integration are planned. Start
+The detector pipeline, hazard simulator, 30- and 60-second fire and smoke
+forecasts, and live routing integration are planned. Start
 feature work from the reviewed setup on `main` and follow [AGENTS.md](AGENTS.md).
 
 ## Shared contract and fixture

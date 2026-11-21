@@ -9,6 +9,7 @@ export default function CameraDialog({ onClose, direction }: {
   const [expanded, setExpanded] = useState(false);
   const [status, setStatus] = useState('Camera is off');
   const [active, setActive] = useState(false);
+  const [failed, setFailed] = useState(false);
 
   useEffect(() => { dialog.current?.showModal(); }, []);
 
@@ -31,7 +32,10 @@ export default function CameraDialog({ onClose, direction }: {
         if (video.current) video.current.srcObject = stream;
         setStatus('');
       } catch (error) {
-        if (!closed) setStatus(error instanceof Error && error.name === 'NotAllowedError'
+        if (closed) return;
+        setFailed(true);
+        setActive(false);
+        setStatus(error instanceof Error && error.name === 'NotAllowedError'
           ? 'Camera permission was denied. Demo overlay is still available.'
           : 'Camera unavailable. Demo overlay is still available.');
       }
@@ -71,7 +75,7 @@ export default function CameraDialog({ onClose, direction }: {
             {!active && <button type="button" onClick={() => {
               setStatus('Requesting camera…');
               setActive(true);
-            }}>Enable camera</button>}
+            }}>{failed ? 'Retry camera' : 'Enable camera'}</button>}
             <button type="button" onClick={() => setExpanded(!expanded)}>
               {expanded ? 'Return to preview' : 'Full screen'}
             </button>

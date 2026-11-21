@@ -1,4 +1,4 @@
-# Northgate Warriors — TidalHack
+# Fire Nations — TidalHack
 
 A student hackathon prototype for dynamic evacuation routing using simulated fire, smoke, and indoor location data.
 

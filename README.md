@@ -1,7 +1,18 @@
 # Fire Nations — TidalHack
 
-Shared hackathon foundation: React + TypeScript + Vite, Python + FastAPI + Pydantic,
-Pytest, and HTTP/JSON. Read [AGENTS.md](AGENTS.md) before changing shared files.
+Fire Nations is a predictive evacuation project designed for eventual use with
+authorized building data. The virtual detector network is the demo's primary
+mocked external data source. The planned algorithms use configurable layouts
+and detector placements to compute hazard estimates, forecasts, and routes.
+The demo requires live computed outputs in the web and mobile views.
+As detector readings change, both views should show the resulting hazard
+estimates, forecasts, and routes. The existing sample routes are placeholders
+until that integration is complete.
+
+See the [six-phase machine learning roadmap](docs/ai-roadmap.md) for the
+replaceable detector interface, graph-based propagation, Python and scikit-learn
+Random Forest forecasts, and evaluation against non-ML baselines. Follow
+[AGENTS.md](AGENTS.md) when changing shared files.
 
 **Simulation only.** The building is fictional, not an approved MSC map. This is
 not a validated emergency navigation system. Official alarms and emergency
@@ -44,9 +55,10 @@ npm.cmd ci
 npm.cmd run dev
 ```
 
-Open http://127.0.0.1:5173. The connection screen should report 7 nodes,
-6 connections, and 2 demo exits. It shows a loading state, or an error if the
-backend is unavailable; start the backend and reload to retry.
+Open http://127.0.0.1:5173 to view the fictional evacuation map. Floor 1 shows
+the simulated fire marker and sample routes. Floors 2 and 3 show floor plans.
+The frontend requests the graph from the backend and starts with the bundled
+fictional fixture, which also supports offline demos.
 `npm.cmd` avoids Windows execution-policy issues with `npm.ps1`.
 
 Stop either server with Ctrl+C. API documentation: http://127.0.0.1:8000/docs.
@@ -64,7 +76,8 @@ npm.cmd run build
 ```
 
 The build runs TypeScript checking and writes the Vite bundle to `frontend/dist`.
-There is no frontend unit-test suite yet; backend API/contract tests use Pytest.
+There is no frontend unit-test suite yet. Backend API, contract, and pathfinding
+tests use Pytest.
 With both servers running, verify direct and proxied HTTP/JSON:
 
 ```powershell
@@ -104,8 +117,8 @@ backend/
     models.py              # authoritative Pydantic contract
     routers/               # future HTTP feature adapters
     simulation/            # reserved for Person 2
-    pathfinding/           # reserved for Person 3
-  tests/                   # API and contract tests
+    pathfinding/           # pure Python risk-weighted Dijkstra
+  tests/                   # API, contract, and pathfinding tests
   pytest.ini
   requirements.txt         # pinned runtime and test dependencies
 data/building.json         # shared fictional graph
@@ -114,28 +127,30 @@ frontend/
   src/
     api/index.ts           # shared relative-URL HTTP client
     types/index.ts         # matching TypeScript interfaces
-    components/            # reserved for Person 1
-    App.tsx                # minimal connection check only
+    components/            # floor map and camera panel
+    App.tsx                # floor picker and sample route visualization
     main.tsx
     style.css
   package.json
   package-lock.json
   tsconfig.json
   vite.config.ts
+MobileApp/                 # MAUI shell bundling the shared frontend
 ```
 
-There is no implemented hazard simulation, evacuation pathfinding, complete map
-UI, database, authentication, or deployment. Those feature modules remain empty
-packages for their assigned teammates. Start feature work from the reviewed
-shared setup on `main` and follow the ownership table in AGENTS.md.
+The backend implements risk-weighted Dijkstra as a standalone Python function.
+FastAPI serves health and graph endpoints, and the frontend uses sample routes.
+The [MAUI shell](MobileApp/README.md) bundles the frontend for offline demos.
+The detector pipeline, hazard simulator, 30- and 60-second fire and smoke
+forecasts, and live routing integration are planned. Start
+feature work from the reviewed setup on `main` and follow [AGENTS.md](AGENTS.md).
 
 ## Shared contract and fixture
 
 - `BuildingGraph`: nodes, modeled edges, and explicit `exitNodeIds`. Coordinates
   and distances use arbitrary demo units, **not meters**. X increases rightward,
-  Y downward; all fixture nodes are on floor 1. A future SVG should use these
-  same coordinates (for example `viewBox="-20 0 320 140"`). No map image or real
-  building data is implied by the fixture.
+  Y downward; all fixture nodes are on Floor 1. The Floor 1 SVG uses this
+  coordinate system. The fixture represents a fictional building.
 - `HazardSnapshot`: nonnegative simulated seconds, area IDs, nullable risk
   scores in [0,1], and blocked edge IDs. Null/omitted scores and absent areas
   mean **unknown**, never zero. No hazard generator is included.
@@ -143,7 +158,7 @@ shared setup on `main` and follow the ownership table in AGENTS.md.
 - `RouteResult`: `ok`, `no_route`, or `invalid_input`. Unavailable results use
   empty node/edge lists and null cost/exit. An `ok` result ends at `exitNodeId`
   and has one edge per node transition; a user already at an exit can have a
-  one-node, zero-edge result. No routing algorithm is included.
+  one-node, zero-edge result. See the [pathfinding engine](backend/app/pathfinding/README.md).
 - JSON uses the specified camelCase names and edge keys `from`/`to`. Python's
   `from_node` is aliased to `from`; serialize with `model_dump(by_alias=True)`.
 - Models reject nonfinite numbers, invalid graph references, duplicate IDs,

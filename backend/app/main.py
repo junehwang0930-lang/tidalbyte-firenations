@@ -9,7 +9,6 @@ from fastapi.responses import FileResponse
 
 from app.models import BuildingGraph, HealthResponse
 from app.pathfinding.atlas_fire import AtlasScenario
-from app.routers.training import load_training, router as training_router
 
 GRAPH_PATH = Path(__file__).resolve().parents[2] / 'data' / 'building.json'
 
@@ -22,12 +21,10 @@ async def lifespan(app: FastAPI):
     app.state.atlas = folder if os.getenv('WAYFIND_LOCAL') == '1' and folder.is_dir() else None
     scenario = folder / 'scenario.json'
     app.state.atlas_scenario = AtlasScenario.load(scenario) if app.state.atlas and scenario.is_file() else None
-    app.state.training = None if app.state.atlas else load_training(GRAPH_PATH.parent)
     yield
 
 
 app = FastAPI(title='Fire Nations demo API', lifespan=lifespan)
-app.include_router(training_router)
 
 
 @app.get('/api/floor-atlas/{level}', include_in_schema=False)

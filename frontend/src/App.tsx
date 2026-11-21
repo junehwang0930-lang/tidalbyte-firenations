@@ -1,170 +1,107 @@
 import { useEffect, useRef, useState } from 'react';
+import { useAtlas } from './useAtlas';
+import AtlasMap from './components/AtlasMap';
+import RoomSelect from './components/RoomSelect';
 import './atlas-route.css';
-
-type Room = { id: string; label: string };
-type Leg = { level: number; points: [number, number][] };
-type Route = {
-  status: 'ok' | 'no_route';
-  reason: string;
-  stair: string | null;
-  exitName: string | null;
-  assumedLanding: boolean;
-  legs: Leg[];
-  firePolygon: [number, number][];
-  forecast: {elapsed: number; horizon: number; cellSize: number; smoke: string; heat: string} | null;
-};
-type Catalog = { rooms: Room[]; defaultRoom: string };
+import CameraPanel from './components/CameraPanel';
+import FloorSelect from './components/FloorSelect';
+import FloorMap, { floors } from './components/FloorMap';
+import type { Floor } from './components/FloorMap';
+import type { GraphNode } from './types';
 
 export default function App() {
-  const [level, setLevel] = useState<1 | 2>(2);
-  const [failed, setFailed] = useState(false);
-  const [enlarged, setEnlarged] = useState(false);
-  const [rooms, setRooms] = useState<Room[]>([]);
-  const [origin, setOrigin] = useState('');
-  const [fire, setFire] = useState('');
-  const [route, setRoute] = useState<Route | null>(null);
-  const [routeError, setRouteError] = useState('');
-  const [loading, setLoading] = useState(false);
-  const requestId = useRef(0);
-  const ignition = useRef<number | null>(null);
-  const defaultOrigin = useRef('');
-  const [resetVersion, setResetVersion] = useState(0);
+  const atlas = useAtlas();
+  const [mapLoaded, setMapLoaded] = useState(false);
+  const [floor, setFloor] = useState<Floor>(2);
+  const [snapshot, setSnapshot] = useState(0);
+  const [camera, setCamera] = useState(false);
+  const [cameraExpanded, setCameraExpanded] = useState(false);
+  const cameraButton = useRef<HTMLButtonElement>(null);
+  const [announcement, setAnnouncement] = useState('');
+  const mapDialog = useRef<HTMLDialogElement>(null);
+  const floorHasScenario = !!atlas.catalog && (floor === 1 || floor === 2);
+  const leg = atlas.route?.status === 'ok' ? atlas.route.legs.find(item => item.level === floor) : undefined;
+  const route: GraphNode[] = mapLoaded && leg ? leg.points.map(([x, y], i) => ({
+    id: `atlas-${floor}-${i}`, areaId: 'atlas', x, y, floor, kind: 'corridor',
+  })) : [];
+  const hasRoute = route.length > 1;
+  const routeStatus = atlas.loading ? 'Calculating simulated route…' : atlas.error ||
+    (atlas.route?.status === 'no_route' ? 'No simulated route available' :
+      hasRoute ? (floor === 2 ? `Via stair ${atlas.route?.stair}` : atlas.route?.exitName ?? 'Modeled exit') :
+        floorHasScenario ? 'No route on this floor' : 'Training map unavailable');
+  const map = floorHasScenario ? <AtlasMap floor={floor} route={atlas.route} onAvailability={setMapLoaded} /> :
+    <FloorMap floor={floor} route={[]} radius={0} fire={undefined} />;
+  const floorPicker = <FloorSelect floors={atlas.catalog ? [1, 2] : floors} value={floor}
+    onChange={value => { if (value !== floor) { setMapLoaded(false); setFloor(value); } }} />;
+  const legend = floorHasScenario
+    ? 'Amber: predicted smoke · Orange: predicted heat · Red: ignition'
+    : 'Fictional preview only · New atlas assets unavailable · No routing';
 
-  useEffect(() => {
-    let active = true;
-    fetch('/api/floor-atlas/scenario/catalog')
-      .then(response => { if (!response.ok) throw new Error('Could not load rooms.'); return response.json() as Promise<Catalog>; })
-      .then(catalog => {
-        if (!active) return;
-        setRooms(catalog.rooms);
-        defaultOrigin.current = catalog.defaultRoom;
-        setOrigin(catalog.defaultRoom);
-      })
-      .catch(() => { if (active) setRouteError('Room list unavailable. Retry by reloading this page.'); });
-    return () => { active = false; };
-  }, []);
-
-  useEffect(() => {
-    if (!origin) return;
-    let timer: number | undefined;
-    let controller: AbortController | undefined;
-    const started = ignition.current;
-    function recalculate() {
-      window.clearTimeout(timer);
-      controller?.abort();
-      controller = new AbortController();
-      const id = ++requestId.current;
-      const age = started === null ? 0 : Math.max(0, Date.now() - started);
-      const query = new URLSearchParams({ origin });
-      if (fire) {
-        query.set('fire', fire);
-        query.set('elapsed', String(Math.floor(age / 1000)));
-        // Schedule against ignition, never against request completion or origin change.
-        if (age < 86400000) timer = window.setTimeout(recalculate, 20000 - age % 20000);
-      }
-      setRoute(null);
-      setRouteError('');
-      setLoading(true);
-      fetch(`/api/floor-atlas/scenario/route?${query}`, {
-        signal: controller.signal, cache: 'no-store',
-      })
-        .then(response => { if (!response.ok) throw new Error('Route request failed.'); return response.json() as Promise<Route>; })
-        .then(result => { if (requestId.current === id) setRoute(result); })
-        .catch(() => { if (requestId.current === id) setRouteError('Route unavailable. No guidance is shown.'); })
-        .finally(() => { if (requestId.current === id) setLoading(false); });
-    }
-    const resume = () => { if (fire && document.visibilityState === 'visible') recalculate(); };
-    recalculate();
-    document.addEventListener('visibilitychange', resume);
-    return () => {
-      requestId.current++; controller?.abort(); window.clearTimeout(timer);
-      document.removeEventListener('visibilitychange', resume);
-    };
-  }, [origin, fire, resetVersion]);
-
-  function resetSimulation() {
-    ++requestId.current;
-    ignition.current = null;
-    setFire(''); setOrigin(defaultOrigin.current); setLevel(2); setEnlarged(false);
-    setFailed(false); setRoute(null); setRouteError(''); setResetVersion(v => v + 1);
+  useEffect(() => { if (atlas.error) setAnnouncement(atlas.error); }, [atlas.error]);
+  function refreshRoute() {
+    atlas.refresh(); setSnapshot(value => value + 1);
+    setAnnouncement('Recomputing route from the current simulated incident.');
   }
 
-  const routePoints = (leg: Leg) => leg.points.map(point => point.join(',')).join(' ');
-  const activeRoute = route?.status === 'ok';
+  function closeCamera() {
+    setCamera(false);
+    setCameraExpanded(false);
+    requestAnimationFrame(() => cameraButton.current?.focus());
+  }
+
   return (
-    <main className="atlas">
-      <header className="atlas-header">
-        <div><span>Wayfind / Map review</span><h1>Memorial Student Center</h1></div>
-        <nav aria-label="Floor">
-          {([2, 1] as const).map(id => <button key={id} aria-pressed={level === id}
-            onClick={() => { setLevel(id); setFailed(false); setEnlarged(false); }}>{`Level ${id}`}</button>)}
-        </nav>
+    <main className={camera ? `dashboard camera-layout${cameraExpanded ? ' camera-layout-expanded' : ''}` : 'dashboard'}>
+      <header className="title">
+        <p>Fire Nations · Fictional MSC</p>
+        <h1>Evacuation</h1>
       </header>
-      <section className="atlas-simulation" aria-label="Route simulation controls">
-        <strong>SIMULATION ONLY — not for emergency navigation.</strong>
-        <label>Selected start
-          <select value={origin} onChange={event => setOrigin(event.target.value)} disabled={!rooms.length}>
-            {rooms.map(room => <option key={room.id} value={room.id}>{room.label}</option>)}
-          </select>
-        </label>
-        <label>Simulated ignition · Level 2
-          <select value={fire} onChange={event => {
-            ignition.current = event.target.value ? Date.now() : null;
-            setFire(event.target.value);
-          }}>
-            <option value="">Clear (no fire)</option>
-            {rooms.map(room => <option key={room.id} value={room.id}>{room.label}</option>)}
-          </select>
-        </label>
-        <button type="button" onClick={resetSimulation} disabled={!rooms.length}>Reset simulation</button>
+      <section className="route-card" aria-label="Demo route" data-ok={floorHasScenario && hasRoute}>
+        <span className="route-icon" aria-hidden="true">
+          <svg className="icon" viewBox="0 0 24 24"><path d="M5 20v-9a3 3 0 0 1 3-3h11m-4-4 4 4-4 4" /></svg>
+        </span>
+        <div><small>Simulated route</small><strong>{routeStatus}</strong></div>
       </section>
-      <figure>
-        <figcaption><h2>Level {level}</h2><span>Whole-floor schematic</span>
-          <button aria-pressed={enlarged} onClick={() => setEnlarged(!enlarged)}>{enlarged ? 'Fit floor' : 'Enlarge'}</button></figcaption>
-        {failed ? <p role="alert">This local drawing is unavailable. Check that the private map server is running.
-          {' '}<button onClick={() => setFailed(false)}>Retry</button></p> :
-          <div className={`atlas-paper${enlarged ? ' enlarged' : ''}`} tabIndex={0} aria-label="Floor drawing; scroll horizontally when enlarged">
-            <div className="atlas-drawing">
-              <img key={level} src={`/api/floor-atlas/${level}`} alt={level === 2
-                ? 'Level 2: Bethancourt Ballroom with its five sections, prefunction lobby, West Wing, main meeting rooms and galleries.'
-                : 'Level 1: Forster Courtyard, Honor Entrance, meeting rooms, food court, Flag Room, galleries and bookstore.'}
-                onError={() => setFailed(true)} />
-              {route && <svg className="atlas-overlay" viewBox="0 0 1240 740" aria-hidden="true">
-                <defs><marker id="exit-arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="14" markerHeight="14"
-                  markerUnits="userSpaceOnUse" orient="auto"><path d="M0 0 10 5 0 10 2 5Z" fill="#075eae" /></marker></defs>
-                {level === 2 && route.forecast && <g fill="none" strokeWidth={route.forecast.cellSize}>
-                  <path d={route.forecast.smoke} stroke="#ce9d34" opacity=".46" />
-                  <path d={route.forecast.heat} stroke="#d45b22" opacity=".68" />
-                </g>}
-                {route.status === 'ok' && route.legs.filter(leg => leg.level === level).map((leg, index) =>
-                  <g key={index}>
-                    <polyline points={routePoints(leg)} className="atlas-route-leg" markerEnd={leg.level===1 ? 'url(#exit-arrow)' : undefined} />
-                    <circle cx={leg.points[0][0]} cy={leg.points[0][1]} r="5" fill="#1164ac" stroke="white" strokeWidth="2" />
-                  </g>)}
-                {level === 2 && fire && route.firePolygon.length > 0 &&
-                  <polygon points={route.firePolygon.map(point => point.join(',')).join(' ')} className="atlas-fire-area" />}
-              </svg>}
-            </div>
-          </div>}
-      </figure>
-      <section className="atlas-route-status" aria-live="polite">
-        {loading && <span>Calculating simulated route…</span>}
-        {route?.forecast && <p>Incident +{route.forecast.elapsed}s · {route.forecast.horizon}s forecast · refreshes every 20s.
-          {' '}Amber: predicted smoke. Orange: predicted heat. Red: ignition room.
-          {' '}Model trained on synthetic grids, not measured MSC conditions.</p>}
-        {routeError && <p role="alert">{routeError}</p>}
-        {route?.status === 'no_route' && <p><strong>No simulated route.</strong> {route.reason}</p>}
-        {activeRoute && <div>
-          <p><strong>{level === 2 ? `Descend via stair ${route.stair}.` : `Modeled exit: ${route.exitName}.`}</strong> {level === 2 ? route.reason : `From stair ${route.stair}, the arrow marks the modeled exterior endpoint.`}</p>
-          {route.assumedLanding && <p className="atlas-warning">Assumed Level 1 landing is active in this model; it has not been verified.</p>}
-          {level === 2 && route.legs.some(leg => leg.level === 1) && <button onClick={() => setLevel(1)}>Continue on Level 1</button>}
-        </div>}
+      {atlas.catalog && <section className="atlas-simulation" aria-label="Simulation controls">
+        <RoomSelect label="Start on Level 2" value={atlas.origin} options={atlas.catalog.rooms} onChange={atlas.selectOrigin} />
+        <RoomSelect label="Simulated ignition" value={atlas.fire}
+          options={[{ id: '', label: 'Clear (no fire)' }, ...atlas.catalog.rooms]} onChange={atlas.selectFire} />
+        <button type="button" onClick={() => { atlas.reset(); setFloor(2); }}>Reset simulation</button>
+        {atlas.route?.forecast && <p>Incident +{atlas.route.forecast.elapsed}s · {atlas.route.forecast.horizon}s forecast · recomputes every 20s.</p>}
+        {atlas.route && <p>{atlas.route.reason}</p>}
+        {atlas.route?.assumedLanding && <p>Landing is assumed and unverified.</p>}
+      </section>}
+      <section className="map-card" aria-label="Simulation map">
+        <div className="map-label">{floorPicker}{camera && <button className="pill" type="button" onClick={refreshRoute}>
+          <svg className="icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M20 4v6h-6m6 0a8 8 0 1 0 0 5" /></svg>
+          <span className="sr-only">Refresh route</span></button>}</div>
+        <button type="button" className="map-trigger" aria-label="Open full-screen floor plan"
+          onClick={() => mapDialog.current?.showModal()}>
+          {map}<svg className="expand icon" viewBox="0 0 24 24" aria-hidden="true">
+            <path d="M14 4h6v6M20 4l-6 6M10 20H4v-6m0 6 6-6" />
+          </svg>
+        </button>
+        <div className="legend">{legend}</div>
       </section>
-      <footer><span>Teal jambs: door opening. Treads: stair. A ? after the stair ID means the landing is projected, not verified.</span>
-        {level === 1 && <span>Green triangles: public entrance locations, not verified emergency exits. Based on the Level 1 directory and <a href="https://ucenter.tamu.edu/facilities/memorial-student-center/points-of-interest/">Texas A&amp;M’s MSC guide</a>.</span>}
-        <span>Matching letters are review IDs, not confirmed connections. Door positions are schematic; directory-only areas lack doorway detail.</span>
-        <span>Hatching: courtyard or open below. Stippling: approximate interior.</span>
-        <span>For layout review · Not to scale or for emergency navigation</span></footer>
+      <div className="actions">
+        <button ref={cameraButton} className="primary" type="button" onClick={() => setCamera(true)}><svg className="icon" viewBox="0 0 24 24" aria-hidden="true">
+          <path d="M3 7h4l2-3h6l2 3h4v13H3z" /><circle cx="12" cy="13" r="3" />
+        </svg>Open AR camera</button>
+        <button className="secondary" type="button" onClick={refreshRoute}><svg className="icon" viewBox="0 0 24 24" aria-hidden="true">
+          <path d="M20 4v6h-6m6 0a8 8 0 1 0 0 5" />
+        </svg>Refresh route<span className="snapshot">#{snapshot + 1}</span></button>
+      </div>
+      <p className="sr-only" role="status">{announcement} {routeStatus}</p>
+      <footer><strong>Simulation only.</strong> Not a validated safety system. Follow official alarms and emergency personnel.</footer>
+      <dialog className="overlay fullscreen" ref={mapDialog} aria-labelledby="map-title">
+        <header className="dialog-header"><h2 id="map-title" className="sr-only">Full-screen floor plan</h2>{floorPicker}
+          <button className="pill" type="button" onClick={() => mapDialog.current?.close()}>Done</button>
+        </header>
+        <div className="full-map">{map}</div>
+        <div className="legend">{legend}</div>
+        <footer>Simulation only · Fictional floor plan</footer>
+      </dialog>
+      {camera && <CameraPanel onClose={closeCamera} route={floorHasScenario && hasRoute ? route : []} edges={[]} floor={floor} endpointLabel={floor === 2 ? `Stair ${atlas.route?.stair ?? ""}` : atlas.route?.exitName ?? "Modeled exit"}
+        expanded={cameraExpanded} onExpand={setCameraExpanded} />}
     </main>
   );
 }

@@ -1,0 +1,20 @@
+{
+  "nodes": [
+    {"id": "room-a", "areaId": "room-a", "x": 40, "y": 40, "floor": 1, "kind": "room"},
+    {"id": "hall-west", "areaId": "hall", "x": 40, "y": 100, "floor": 1, "kind": "corridor"},
+    {"id": "junction", "areaId": "hall", "x": 140, "y": 100, "floor": 1, "kind": "junction"},
+    {"id": "room-b", "areaId": "room-b", "x": 140, "y": 40, "floor": 1, "kind": "room"},
+    {"id": "hall-east", "areaId": "hall", "x": 240, "y": 100, "floor": 1, "kind": "corridor"},
+    {"id": "exit-west", "areaId": "exit-west", "x": 0, "y": 100, "floor": 1, "kind": "exit"},
+    {"id": "exit-east", "areaId": "exit-east", "x": 280, "y": 100, "floor": 1, "kind": "exit"}
+  ],
+  "edges": [
+    {"id": "room-a-hall", "from": "room-a", "to": "hall-west", "distance": 60, "bidirectional": true},
+    {"id": "west-junction", "from": "hall-west", "to": "junction", "distance": 100, "bidirectional": true},
+    {"id": "room-b-hall", "from": "room-b", "to": "junction", "distance": 60, "bidirectional": true},
+    {"id": "junction-east", "from": "junction", "to": "hall-east", "distance": 100, "bidirectional": true},
+    {"id": "west-exit", "from": "hall-west", "to": "exit-west", "distance": 40, "bidirectional": true},
+    {"id": "east-exit", "from": "hall-east", "to": "exit-east", "distance": 40, "bidirectional": true}
+  ],
+  "exitNodeIds": ["exit-west", "exit-east"]
+}

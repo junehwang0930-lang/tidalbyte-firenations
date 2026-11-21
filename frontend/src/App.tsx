@@ -1,7 +1,8 @@
 import { useEffect, useRef, useState } from 'react';
 import { getGraph } from './api';
 import CameraPanel from './components/CameraPanel';
-import FloorMap from './components/FloorMap';
+import FloorMap, { floors } from './components/FloorMap';
+import type { Floor } from './components/FloorMap';
 import type { BuildingGraph, GraphNode } from './types';
 import demoGraph from '../../data/building.json';
 
@@ -13,6 +14,7 @@ const fixture = demoGraph as BuildingGraph;
 
 export default function App() {
   const [graph, setGraph] = useState(fixture);
+  const [floor, setFloor] = useState<Floor>(1);
   const [snapshot, setSnapshot] = useState(0);
   const [camera, setCamera] = useState(false);
   const [cameraExpanded, setCameraExpanded] = useState(false);
@@ -28,8 +30,22 @@ export default function App() {
       (edge.bidirectional && edge.to === route[i].id && edge.from === node.id)));
   const hasRoute = connected && graph.exitNodeIds.includes(routeIds[routeIds.length - 1]);
   const direction = hasRoute ? (phase === 0 ? 'East exit' : 'West exit') : '';
-  const map = <FloorMap route={hasRoute ? route : []} radius={phase === 0 ? 47 : 72}
-    fire={nodes.get(phase === 0 ? 'room-a' : 'hall-east')} />;
+  const floorHasScenario = floor === 1;
+  const map = <FloorMap floor={floor} route={floorHasScenario && hasRoute ? route : []}
+    radius={phase === 0 ? 47 : 72}
+    fire={floorHasScenario ? nodes.get(phase === 0 ? 'room-a' : 'hall-east') : undefined} />;
+  const floorPicker = <label className="floor-picker">
+    <span>Floor</span>
+    <select aria-label="Building floor" value={floor} onChange={event => {
+      const selected = floors.find(value => String(value) === event.target.value);
+      if (selected !== undefined) setFloor(selected);
+    }}>
+      {floors.map(value => <option key={value} value={value}>Floor {value}</option>)}
+    </select>
+  </label>;
+  const legend = floorHasScenario
+    ? <><span className="heat-ramp" aria-hidden="true" />High → low simulated fire intensity</>
+    : 'Fictional floor plan · No simulation data';
 
   useEffect(() => {
     const controller = new AbortController();
@@ -58,21 +74,20 @@ export default function App() {
         <h1>Evacuation map</h1>
       </section>
       <section className="map-card" aria-label="Simulation map">
-        <div className="map-label"><strong>Floor 1</strong>{camera ? <button className="glass-control" type="button" onClick={refreshRoute}>Refresh route</button> : <span>Floor plan</span>}</div>
+        <div className="map-label">{floorPicker}{camera ? <button className="glass-control" type="button" onClick={refreshRoute}>Refresh route</button> : <span>Floor plan</span>}</div>
         <button type="button" className="map-trigger" aria-label="Open full-screen floor plan"
           onClick={() => mapDialog.current?.showModal()}>
           {map}<svg className="expand icon" viewBox="0 0 24 24" aria-hidden="true">
             <path d="M14 4h6v6M20 4l-6 6M10 20H4v-6m0 6 6-6" />
           </svg>
         </button>
-        <div className="legend"><span className="heat-ramp" aria-hidden="true" />
-          <span>High → low simulated fire intensity</span></div>
+        <div className="legend">{legend}</div>
       </section>
       <section className="route-status" aria-label="Demo route">
         <svg className="route-icon icon" viewBox="0 0 24 24" aria-hidden="true">
           <path d="M5 20v-9a3 3 0 0 1 3-3h11m-4-4 4 4-4 4" />
         </svg>
-        <div><small>Simulated route</small><strong>{direction || 'No demo route available'}</strong></div>
+        <div><small>Simulated route</small><strong>{floorHasScenario ? (direction || 'No demo route available') : 'Routing demo on Floor 1'}</strong></div>
         <span className="snapshot">Snapshot {snapshot + 1}</span>
       </section>
       <div className="actions">
@@ -86,15 +101,15 @@ export default function App() {
       <p className="sr-only" role="status">{announcement} {direction}</p>
       <footer><strong>Simulation only.</strong> Follow official alarms and emergency personnel.</footer>
       <dialog className="overlay fullscreen" ref={mapDialog} aria-labelledby="map-title">
-        <header className="dialog-header"><h2 id="map-title">Floor 1</h2>
+        <header className="dialog-header"><h2 id="map-title" className="sr-only">Full-screen floor plan</h2>{floorPicker}
           <button className="close" type="button" aria-label="Close full-screen map"
             onClick={() => mapDialog.current?.close()}>×</button>
         </header>
         <div className="full-map">{map}</div>
-        <div className="legend"><span className="heat-ramp" aria-hidden="true" />High → low simulated fire intensity</div>
+        <div className="legend">{legend}</div>
         <footer>Simulation only · Fictional floor plan</footer>
       </dialog>
-      {camera && <CameraPanel onClose={closeCamera} direction={direction}
+      {camera && <CameraPanel onClose={closeCamera} direction={floorHasScenario ? direction : ''}
         expanded={cameraExpanded} onExpand={setCameraExpanded} />}
     </main>
   );

@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState } from 'react';
 import { getGraph } from './api';
-import CameraDialog from './components/CameraDialog';
+import CameraPanel from './components/CameraPanel';
 import FloorMap from './components/FloorMap';
 import type { BuildingGraph, GraphNode } from './types';
 import demoGraph from '../../data/building.json';
@@ -15,6 +15,8 @@ export default function App() {
   const [graph, setGraph] = useState(fixture);
   const [snapshot, setSnapshot] = useState(0);
   const [camera, setCamera] = useState(false);
+  const [cameraExpanded, setCameraExpanded] = useState(false);
+  const cameraButton = useRef<HTMLButtonElement>(null);
   const [announcement, setAnnouncement] = useState('');
   const mapDialog = useRef<HTMLDialogElement>(null);
   const phase = snapshot % demoRoutes.length;
@@ -42,15 +44,21 @@ export default function App() {
     setAnnouncement(`Demo route refreshed for snapshot ${snapshot + 2}.`);
   }
 
+  function closeCamera() {
+    setCamera(false);
+    setCameraExpanded(false);
+    requestAnimationFrame(() => cameraButton.current?.focus());
+  }
+
   return (
-    <main className="dashboard">
+    <main className={camera ? `dashboard camera-layout${cameraExpanded ? ' camera-layout-expanded' : ''}` : 'dashboard'}>
       <header className="brand">Fire Nations</header>
       <section className="title">
         <p>Fictional MSC</p>
         <h1>Evacuation map</h1>
       </section>
       <section className="map-card" aria-label="Simulation map">
-        <div className="map-label"><strong>Floor 1</strong><span>Floor plan</span></div>
+        <div className="map-label"><strong>Floor 1</strong>{camera ? <button className="glass-control" type="button" onClick={refreshRoute}>Refresh route</button> : <span>Floor plan</span>}</div>
         <button type="button" className="map-trigger" aria-label="Open full-screen floor plan"
           onClick={() => mapDialog.current?.showModal()}>
           {map}<svg className="expand icon" viewBox="0 0 24 24" aria-hidden="true">
@@ -68,7 +76,7 @@ export default function App() {
         <span className="snapshot">Snapshot {snapshot + 1}</span>
       </section>
       <div className="actions">
-        <button type="button" onClick={() => setCamera(true)}><svg className="icon" viewBox="0 0 24 24" aria-hidden="true">
+        <button ref={cameraButton} type="button" onClick={() => setCamera(true)}><svg className="icon" viewBox="0 0 24 24" aria-hidden="true">
           <path d="M3 7h4l2-3h6l2 3h4v13H3z" /><circle cx="12" cy="13" r="3" />
         </svg>Camera AR view</button>
         <button type="button" onClick={refreshRoute}><svg className="icon" viewBox="0 0 24 24" aria-hidden="true">
@@ -86,7 +94,8 @@ export default function App() {
         <div className="legend"><span className="heat-ramp" aria-hidden="true" />High → low simulated fire intensity</div>
         <footer>Simulation only · Fictional floor plan</footer>
       </dialog>
-      {camera && <CameraDialog onClose={() => setCamera(false)} direction={direction} />}
+      {camera && <CameraPanel onClose={closeCamera} direction={direction}
+        expanded={cameraExpanded} onExpand={setCameraExpanded} />}
     </main>
   );
 }

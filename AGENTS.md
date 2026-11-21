@@ -48,6 +48,8 @@ Integration flow: React frontend -> FastAPI JSON API -> Python hazard simulation
 
 ## Git workflow and AI agent rules (mandatory)
 
+Default authorization for assigned code and documentation tasks includes implementing changes, running relevant checks, committing the task's files, pushing the assigned feature branch, and opening or updating its PR. Perform these steps without waiting for a separate request to commit or share. This does not authorize merging, pushing directly to `main`, force-pushing, publishing secrets, or including unrelated work. Explicit task-specific instructions such as "local only" or "do not push" override this default; report which sharing steps were intentionally skipped. Tool permissions and authentication requirements still apply.
+
 - Check the current branch and working-tree state before editing (`git status --short --branch`). Do not discard, overwrite, move, or silently commit teammate or unrelated user work. Stay within your assigned module and feature branch.
 - Before starting new work, fetch the latest remote changes. Incorporate `main` into your feature branch when safe; coordinate conflicts and shared-file edits. Never force-push or reset away existing work.
 - Read existing files and shared types first. If the scaffold or agreed interface is missing, propose the necessary changes before implementing.
@@ -75,4 +77,30 @@ If GitHub authentication, permissions, conflicts, or the execution environment p
 ### Recover existing uncommitted work
 
 Each teammate must run the checklist above in their own workspace for any work already completed but not yet committed or pushed. Review and preserve existing changes before fetching or merging updates; do not use destructive commands or blindly stage unrelated files. Publish the work on its assigned feature branch and open or update its PR into `main`. Local changes in another teammate's workspace cannot be recovered merely by inspecting GitHub.
+
+### Team sharing cycle
+
+1. Start new feature branches from the latest `origin/main`. For an existing feature branch, incorporate updated `main` when safe, preserving local work and coordinating conflicts.
+2. Implement and validate a coherent change on the assigned branch, then commit and push it. A pushed branch shares code immediately; merging is a separate decision.
+3. Open a draft PR for unfinished work or a ready-for-review PR for completed work. Update the same open PR as work progresses. If the previous PR was merged or closed, use a fresh branch and PR for a new task.
+4. A teammate reviews the PR; an authorized team member merges it. Agents do not merge automatically.
+5. After a merge, teammates fetch and incorporate the updated `main` before continuing dependent work. Unmerged PRs are not yet part of the shared baseline; document any dependency on them.
+
+### Reusable teammate prompt
+
+Replace the placeholders with the assigned branch and a concrete task. Keep this repository open as the agent's workspace. Instructions must be present in that checkout: after this instructions PR is merged, synchronize with `main` before starting.
+
+```text
+Read and follow the root AGENTS.md, any applicable nested AGENTS.md files,
+and .github/copilot-instructions.md before editing.
+My assigned branch is <feature/map-frontend | feature/hazard-simulation | feature/pathfinding>.
+Task: <describe the change and acceptance criteria>.
+Preserve unrelated work and stay within my assigned scope.
+Run relevant checks, commit this task's changes, push my feature branch,
+and open or update its PR into main. Use a draft PR if unfinished.
+Do not push directly to main or merge any PR.
+Report the commit SHA, PR link, check results, and remaining blockers.
+```
+
+This prompt makes the intended workflow explicit; it cannot grant missing repository access or override higher-priority tool restrictions. Avoid adding "do not push" unless the task really must remain local.
 

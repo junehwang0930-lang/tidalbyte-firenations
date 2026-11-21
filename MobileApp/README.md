@@ -4,6 +4,8 @@ The MAUI shell bundles the shared React frontend into the app at build time.
 The bundled demo runs offline with the fictional floor plan and two sample route
 snapshots. The camera overlay uses a simulated heading.
 
+On Linux, use the web demo from the repository README.
+
 On a Mac with Xcode 27.2, its iOS simulator runtime, the .NET 10 SDK pinned by
 `global.json`, the matching MAUI workload, and Node.js 22.12 or newer, run these
 commands from the repository root:

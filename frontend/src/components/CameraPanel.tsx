@@ -54,8 +54,16 @@ export default function CameraPanel({ onClose, route, edges, expanded, onExpand 
 
   // The camera starts as soon as the AR view opens; no extra tap needed.
   useEffect(() => {
+    const preview = video.current;
+    if (!preview) return;
     let closed = false;
     let stream: MediaStream | undefined;
+    function releaseStream() {
+      if (!stream) return;
+      if (preview?.srcObject === stream) preview.srcObject = null;
+      stream.getTracks().forEach(track => track.stop());
+      stream = undefined;
+    }
     setState('starting');
     (async () => {
       try {
@@ -63,19 +71,20 @@ export default function CameraPanel({ onClose, route, edges, expanded, onExpand 
         stream = await navigator.mediaDevices.getUserMedia({
           audio: false, video: { facingMode: { ideal: 'environment' } },
         });
-        if (closed) return stream.getTracks().forEach(track => track.stop());
-        if (video.current) {
-          video.current.srcObject = stream;
-          await video.current.play().catch(() => undefined);
-        }
-        setState('live');
+        if (closed) return releaseStream();
+        preview.srcObject = stream;
+        await preview.play();
+        if (!closed) setState('live');
       } catch (error) {
-        if (!closed) setState(error instanceof Error && error.name === 'NotAllowedError' ? 'denied' : 'unavailable');
+        if (closed) return;
+        const permissionDenied = !stream && error instanceof Error && error.name === 'NotAllowedError';
+        releaseStream();
+        setState(permissionDenied ? 'denied' : 'unavailable');
       }
     })();
     return () => {
       closed = true;
-      stream?.getTracks().forEach(track => track.stop());
+      releaseStream();
     };
   }, [attempt]);
 
@@ -162,7 +171,7 @@ export default function CameraPanel({ onClose, route, edges, expanded, onExpand 
         {step ? <>
           <p className="ar-sub">Leave {placeNames[step.start.id] ?? 'this room'} · Floor 1</p>
           <p className="ar-main">
-            In {Math.round(step.distance)} m <span className="ar-glyph" aria-hidden="true">{turnGlyph}</span>{' '}
+            In {Math.round(step.distance)} demo units <span className="ar-glyph" aria-hidden="true">{turnGlyph}</span>{' '}
             {step.turn === 'straight' ? `Continue to ${step.toward}` : `Turn ${step.turn} into ${step.toward}`}
           </p>
         </> : <p className="ar-main">No simulated route on this floor</p>}

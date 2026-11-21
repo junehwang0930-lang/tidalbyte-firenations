@@ -1,0 +1,1 @@
+"""Fire Nations shared backend."""

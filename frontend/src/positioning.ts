@@ -74,7 +74,7 @@ export class FloorEstimator {
 }
 
 export type Reference = { latitude: number; longitude: number; x: number; y: number };
-export type MapFix = { x: number; y: number; radius: number; floor: SensorFloor };
+export type MapFix = { x: number; y: number; radius: number; heading?: number | null; floor: SensorFloor };
 
 // A local affine transform is valid only inside the surveyed control triangle.
 export function projectFix(refs: Reference[], latitude: number, longitude: number, accuracy: number,
@@ -116,4 +116,21 @@ export function matchBethancourt(fix: MapFix | null, rooms: { id: string; polygo
     return inside;
   });
   return matches.length === 1 ? matches[0].id : null;
+}
+
+type GeoSample = { latitude: number; longitude: number; accuracy: number };
+// Extrema of the exterior outline in each atlas SVG (excluding drawing margins).
+const bounds = { 1: [32,43,1180,677], 2: [26,20,1184,684] } as const;
+export function relativeFix(anchor: GeoSample, current: GeoSample, floor: SensorFloor): MapFix | null {
+  if (![anchor,current].every(p => Number.isFinite(p.latitude) && Math.abs(p.latitude)<90 &&
+    Number.isFinite(p.longitude) && Math.abs(p.longitude)<=180 && p.accuracy>=0 && p.accuracy<=10)) return null;
+  const [left,top,right,bottom] = bounds[floor];
+  const sx = (right-left)/(640*.3048), sy = (bottom-top)/(410*.3048);
+  const east = (current.longitude-anchor.longitude)*111320*Math.cos(anchor.latitude*Math.PI/180);
+  const north = (current.latitude-anchor.latitude)*111320;
+  // Align floor plates by normalized footprint. Bethancourt's modeled center is on Level 2.
+  const x = left + (264-26)/(1184-26)*(right-left) + east*sx;
+  const y = top + (524-20)/(684-20)*(bottom-top) - north*sy;
+  if (x<left || x>right || y<top || y>bottom) return null;
+  return { x, y, floor, radius:(anchor.accuracy+current.accuracy)*Math.max(sx,sy) };
 }

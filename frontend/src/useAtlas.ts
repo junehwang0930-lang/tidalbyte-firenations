@@ -8,26 +8,45 @@ export type AtlasRoute = {
 };
 type Catalog = { rooms: { id: string; label: string }[]; defaultRoom: string };
 
-export function useAtlas(deviceRoom?: string | null) {
+import type { MapFix } from './positioning';
+
+// Older mobile browsers support AbortController but lack AbortSignal.any/timeout.
+async function fetchJson<T>(url: string, parent: AbortSignal): Promise<T> {
+  const controller = new AbortController();
+  const abort = () => controller.abort();
+  parent.addEventListener('abort', abort, { once: true });
+  if (parent.aborted) abort();
+  const timeout = window.setTimeout(abort, 3000);
+  try {
+    const response = await fetch(url, { signal: controller.signal, cache: 'no-store' });
+    if (!response.ok) throw Error('Atlas request failed.');
+    return await response.json() as T;
+  } finally {
+    window.clearTimeout(timeout);
+    parent.removeEventListener('abort', abort);
+  }
+}
+
+export function useAtlas(device?: MapFix | null) {
   const [catalog, setCatalog] = useState<Catalog | null>(null);
   const [offline, setOffline] = useState(false);
   const [manualOrigin, setOrigin] = useState('');
-  const origin = deviceRoom === undefined ? manualOrigin :
-    catalog?.rooms.some(room => room.id === deviceRoom) ? deviceRoom! : '';
+  const origin = device === undefined ? manualOrigin : device && catalog ? catalog.defaultRoom : '';
+  const liveX = device ? Math.round(device.x / 2)*2 : undefined;
+  const liveY = device ? Math.round(device.y / 2)*2 : undefined;
+  const liveFloor = device?.floor, radius = device ? Math.ceil(device.radius) : undefined;
   const [resultOrigin, setResultOrigin] = useState('');
   const [fire, setFire] = useState('');
   const [route, setRoute] = useState<AtlasRoute | null>(null);
   const [error, setError] = useState('Loading training map…');
   const [loading, setLoading] = useState(false);
   const [version, setVersion] = useState(0);
+  const key = [origin,liveX,liveY,liveFloor,radius,fire,version].join('/');
   const ignition = useRef<number | null>(null);
   const requestId = useRef(0);
   useEffect(() => {
     const controller = new AbortController();
-    fetch('/api/floor-atlas/scenario/catalog', { signal: controller.signal }).then(async response => {
-      if (!response.ok) throw Error('Atlas unavailable. Start the demo backend on localhost.');
-      return response.json() as Promise<Catalog>;
-    }).catch(async reason => {
+    fetchJson<Catalog>('/api/floor-atlas/scenario/catalog', controller.signal).catch(async reason => {
       if (controller.signal.aborted) throw reason;
       const { offlineCatalog } = await import('./atlasOffline');
       if (!controller.signal.aborted) setOffline(true);
@@ -55,21 +74,26 @@ export function useAtlas(deviceRoom?: string | null) {
       if (fire) query.set('fire', fire);
       if (fire && age < 86400000) timer = window.setTimeout(calculate, 20000 - age % 20000);
       setRoute(null); setError(''); setLoading(true);
-      const request = offline
-        ? import('./atlasOffline').then(({ offlineRoute }) => offlineRoute(origin, fire, elapsed))
-        : fetch(`/api/floor-atlas/scenario/route?${query}`, { signal: controller.signal, cache: 'no-store' })
-          .then(async response => { if (!response.ok) throw Error('Route unavailable. Clear/reset the scenario or check the backend.'); return response.json() as Promise<AtlasRoute>; });
+      const request = offline || liveFloor
+        ? import('./atlasOffline').then(({ offlineRoute }) => offlineRoute(origin, fire, elapsed, liveFloor && liveX !== undefined && liveY !== undefined && radius !== undefined ? {floor: liveFloor, x:liveX, y:liveY, radius} : undefined))
+        : fetchJson<AtlasRoute>(`/api/floor-atlas/scenario/route?${query}`, controller.signal)
+          .catch(async reason => {
+            if (id !== requestId.current) throw reason;
+            const { offlineRoute } = await import('./atlasOffline');
+            if (id === requestId.current) setOffline(true);
+            return offlineRoute(origin, fire, elapsed);
+          });
       request
-        .then(result => { if (id === requestId.current) { setResultOrigin(origin); setRoute(result); } })
+        .then(result => { if (id === requestId.current) { setResultOrigin(key); setRoute(result); } })
         .catch(reason => { if (id === requestId.current && !controller.signal.aborted) setError(reason.message); })
         .finally(() => { if (id === requestId.current) setLoading(false); });
     }
     const resume = () => { if (document.visibilityState === 'visible') calculate(); };
     calculate(); document.addEventListener('visibilitychange', resume);
     return () => { ++requestId.current; controller?.abort(); window.clearTimeout(timer); document.removeEventListener('visibilitychange', resume); };
-  }, [origin, fire, version, offline]);
+  }, [origin, fire, version, offline, key, liveFloor, liveX, liveY, radius]);
   const invalidate = () => { ++requestId.current; setRoute(null); setError(''); };
-  return { catalog, offline, origin, fire, route: origin && resultOrigin === origin ? route : null, error, loading,
+  return { catalog, offline, origin, fire, route: origin && resultOrigin === key ? route : null, error, loading,
     selectOrigin: (value: string) => { invalidate(); setOrigin(value); setVersion(v => v + 1); },
     selectFire: (value: string) => { invalidate(); ignition.current = value ? Date.now() : null; setFire(value); setVersion(v => v + 1); },
     refresh: () => { invalidate(); setVersion(v => v + 1); },

@@ -119,7 +119,32 @@ class RouteQueue {
   }
 }
 
-export async function offlineRoute(origin: string, fire: string, elapsed: number): Promise<AtlasRoute> {
+export type DeviceStart = { floor: number; x: number; y: number; radius: number };
+
+function lowerContinuation(fix: DeviceStart, result: AtlasRoute): AtlasRoute {
+  const candidates = [];
+  for (const stair of stairs) {
+    if (!stair.exitName || !stair.lowerPath?.length) continue;
+    for (let i = 1; i < stair.lowerPath.length; i++) {
+      const [ax,ay] = stair.lowerPath[i-1], [bx,by] = stair.lowerPath[i];
+      const dx = bx-ax, dy = by-ay, squared = dx*dx+dy*dy;
+      if (!squared) continue;
+      const t = Math.max(0,Math.min(1,((fix.x-ax)*dx+(fix.y-ay)*dy)/squared));
+      const start: Point = [ax+t*dx,ay+t*dy];
+      const distance = Math.hypot(fix.x-start[0],fix.y-start[1]);
+      if (distance <= Math.min(fix.radius+step, 12)) candidates.push({ stair, i, start, distance });
+    }
+  }
+  candidates.sort((a,b) => a.distance-b.distance);
+  const first = candidates[0];
+  if (!first || candidates.some(c => c.stair.exitName !== first.stair.exitName && c.distance <= first.distance+fix.radius))
+    return {...result, reason:'Location is outside a uniquely matched modeled Level 1 exit path.'};
+  return {...result, status:'ok', reason:'Approximate progress along a modeled Level 1 continuation.',
+    exitName:first.stair.exitName, stair:first.stair.id, assumedLanding:first.stair.assumedLanding,
+    legs:[{level:1, points:[first.start,...first.stair.lowerPath.slice(first.i) as Point[]]}]};
+}
+
+export async function offlineRoute(origin: string, fire: string, elapsed: number, device?: DeviceStart): Promise<AtlasRoute> {
   const room = roomsById.get(origin);
   const ignition = roomsById.get(fire);
   if (!room || (fire && !ignition)) throw new Error('Select a Level 2 room from the catalog.');
@@ -140,7 +165,9 @@ export async function offlineRoute(origin: string, fire: string, elapsed: number
     result.forecast = { elapsed, horizon, cellSize: step, smoke: overlay(field, smoke), heat: overlay(field, heat) };
   }
 
-  const start = index(room.point);
+  if (device?.floor === 1) return lowerContinuation(device, result);
+  const start = index(device ? [device.x, device.y] : room.point);
+  if (device && !mask[start]) return {...result, reason:'Position overlaps an unmapped or blocked cell.'};
   const exposure = (cell: number) => field && field[cell] >= 0 ? Math.min(far, field[cell]) : far;
   if (exposure(start) <= hard) {
     result.reason = 'Start is inside the fire exclusion zone or the predicted smoke/heat footprint.';

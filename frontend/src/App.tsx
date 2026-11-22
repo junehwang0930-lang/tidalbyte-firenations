@@ -1,3 +1,4 @@
+import LocationPanel from "./components/LocationPanel";
 import { useEffect, useRef, useState } from 'react';
 import { useAtlas } from './useAtlas';
 import AtlasMap from './components/AtlasMap';
@@ -9,8 +10,11 @@ import FloorMap, { floors } from './components/FloorMap';
 import type { Floor } from './components/FloorMap';
 import type { GraphNode } from './types';
 
+import type { MapFix } from './positioning';
+
 export default function App() {
   const atlas = useAtlas();
+  const [mapFix, setMapFix] = useState<MapFix | null>(null);
   const [mapLoaded, setMapLoaded] = useState(false);
   const [floor, setFloor] = useState<Floor>(2);
   const [snapshot, setSnapshot] = useState(0);
@@ -35,7 +39,7 @@ export default function App() {
     setFloor(value);
   }
   const renderMap = (onAvailability?: (available: boolean) => void) => floorHasScenario
-    ? <AtlasMap key={floor} floor={floor} route={atlas.route} offline={atlas.offline}
+    ? <AtlasMap mapFix={mapFix} key={floor} floor={floor} route={atlas.route} offline={atlas.offline}
         onAvailability={onAvailability} />
     : <FloorMap floor={floor} route={[]} radius={0} fire={undefined} />;
   const floorPicker = <FloorSelect floors={floors} value={floor} onChange={selectFloor} />;
@@ -68,6 +72,7 @@ export default function App() {
         <div><small>Simulated route</small><strong>{routeStatus}</strong></div>
       </section>
       {atlas.catalog && <section className="atlas-simulation" aria-label="Simulation controls">
+        <LocationPanel onMapFix={setMapFix} onFloor={selectFloor} />
         <RoomSelect label="Start on Level 2" value={atlas.origin} options={atlas.catalog.rooms} onChange={atlas.selectOrigin} />
         <RoomSelect label="Simulated ignition" value={atlas.fire}
           options={[{ id: '', label: 'Clear (no fire)' }, ...atlas.catalog.rooms]} onChange={atlas.selectFire} />

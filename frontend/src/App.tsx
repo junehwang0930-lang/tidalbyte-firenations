@@ -11,7 +11,6 @@ import type { Floor } from './components/FloorMap';
 import type { GraphNode } from './types';
 
 import scenario from '../../data/floor-atlas/scenario.json';
-import calibration from '../../data/floor-atlas/calibration.json';
 import { matchBethancourt } from './positioning';
 import type { MapFix } from './positioning';
 
@@ -19,7 +18,7 @@ export default function App() {
   const [mapFix, setMapFix] = useState<MapFix | null>(null);
   const [liveOrigin, setLiveOrigin] = useState(false);
   const matched = matchBethancourt(mapFix, scenario.rooms);
-  const atlas = useAtlas(liveOrigin ? matched : undefined);
+  const atlas = useAtlas(liveOrigin ? mapFix : undefined);
   const [mapLoaded, setMapLoaded] = useState(false);
   const [floor, setFloor] = useState<Floor>(2);
   const [snapshot, setSnapshot] = useState(0);
@@ -34,8 +33,8 @@ export default function App() {
     id: `atlas-${floor}-${i}`, areaId: 'atlas', x, y, floor, kind: 'corridor',
   })) : [];
   const hasRoute = route.length > 1;
-  const routeStatus = liveOrigin && !atlas.origin ? 'Waiting for a confirmed Bethancourt room' : atlas.loading ? 'Calculating simulated route…' : atlas.error ||
-    (atlas.route?.status === 'no_route' ? 'No simulated route available' :
+  const routeStatus = liveOrigin && !atlas.origin ? 'Waiting for a fresh device position' : atlas.loading ? 'Calculating simulated route…' : atlas.error ||
+    (atlas.route?.status === 'no_route' ? atlas.route.reason :
       hasRoute ? (floor === 2 ? `Via stair ${atlas.route?.stair}` : atlas.route?.exitName ?? 'Modeled exit') :
         floorHasScenario ? 'No route on this floor' : 'Training map unavailable');
   function selectFloor(value: Floor) {
@@ -78,10 +77,10 @@ export default function App() {
       </section>
       {atlas.catalog && <section className="atlas-simulation" aria-label="Simulation controls">
         <LocationPanel onMapFix={setMapFix} onFloor={selectFloor} />
-        <label><input type="checkbox" checked={liveOrigin} onChange={e => setLiveOrigin(e.target.checked)} /> Use device location for Bethancourt routes</label>
-        {liveOrigin ? <p>{calibration[2].length !== 3 ? 'Level 2 needs three verified map reference points. Use the room selector for a manual start.' :
-          matched ? `Estimated room: ${atlas.catalog.rooms.find(room => room.id === matched)?.label ?? matched}. Route starts at its modeled anchor.` :
-            'Enable device tracking and confirm Level 2. A room match requires a fresh fix wholly inside one section.'}</p> :
+        <label><input type="checkbox" checked={liveOrigin} onChange={e => setLiveOrigin(e.target.checked)} /> Route from my estimated position</label>
+        {liveOrigin ? <p>{!mapFix ? 'Track the device and check in at the ballroom center with a fresh, accurate reading.' :
+          matched ? `Estimated room: ${atlas.catalog.rooms.find(room => room.id === matched)?.label ?? matched}. Route follows the estimated grid position.` :
+            'Approximate device position. Routing uses modeled walkable paths.'}</p> :
         <RoomSelect label="Start on Level 2" value={atlas.origin} options={atlas.catalog.rooms} onChange={atlas.selectOrigin} />}
         <RoomSelect label="Simulated ignition" value={atlas.fire}
           options={[{ id: '', label: 'Clear (no fire)' }, ...atlas.catalog.rooms]} onChange={atlas.selectFire} />

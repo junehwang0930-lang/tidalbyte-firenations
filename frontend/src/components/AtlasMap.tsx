@@ -31,6 +31,8 @@ export default function AtlasMap({ mapFix, floor, route, offline, onAvailability
     </svg>}
     {image === 'ready' && mapFix?.floor === floor && <svg className="atlas-overlay" viewBox="0 0 1240 740" aria-label="Estimated device location">
       <circle cx={mapFix.x} cy={mapFix.y} r={mapFix.radius} fill="var(--accent)" opacity=".18" />
+      {mapFix.heading != null && <path transform={`translate(${mapFix.x} ${mapFix.y}) rotate(${mapFix.heading})`}
+        d="M0 -13 L-4 -4 L4 -4 Z" fill="var(--accent)" />}
       <circle className="location-dot" cx={mapFix.x} cy={mapFix.y} r="5" />
     </svg>}
   </div>;

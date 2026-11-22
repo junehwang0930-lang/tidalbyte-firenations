@@ -1,7 +1,7 @@
 import { useEffect, useRef, useState } from 'react';
 import calibration from '../../../data/floor-atlas/calibration.json';
 import type { MapFix } from '../positioning';
-import { FloorEstimator, projectFix, smoothHeading } from '../positioning';
+import { FloorEstimator, projectFix, relativeFix, smoothHeading } from '../positioning';
 import type { SensorFloor } from '../positioning';
 
 export default function LocationPanel({ onFloor, onMapFix }: { onFloor: (floor: SensorFloor) => void; onMapFix: (fix: MapFix | null) => void }) {
@@ -10,17 +10,21 @@ export default function LocationPanel({ onFloor, onMapFix }: { onFloor: (floor: 
   const [message, setMessage] = useState('');
   const [heading, setHeading] = useState<number | null>(null);
   const [motion, setMotion] = useState('');
+  const [anchor, setAnchor] = useState<GeolocationCoordinates | null>(null);
+  const [manualFloor, setManualFloor] = useState<SensorFloor>(2);
   const model = useRef(new FloorEstimator());
   const session = useRef(0);
   const callback = useRef(onFloor);
   callback.current = onFloor;
 
-  const estimatedFloor = model.current.confident ? model.current.floor : null;
+  const estimatedFloor = model.current.floor ?? manualFloor;
   useEffect(() => {
-    onMapFix(fix && estimatedFloor ? projectFix(calibration[estimatedFloor], fix.coords.latitude,
-      fix.coords.longitude, fix.coords.accuracy, estimatedFloor) : null);
+    const point = !fix ? null : calibration[estimatedFloor].length === 3
+      ? projectFix(calibration[estimatedFloor], fix.coords.latitude, fix.coords.longitude, fix.coords.accuracy, estimatedFloor)
+      : anchor && relativeFix(anchor, fix.coords, estimatedFloor);
+    onMapFix(point ? { ...point, heading } : null);
     return () => onMapFix(null);
-  }, [fix, estimatedFloor, onMapFix]);
+  }, [anchor, fix, heading, estimatedFloor, onMapFix]);
 
   function start() {
     if (!window.isSecureContext || !navigator.geolocation) {
@@ -97,16 +101,19 @@ export default function LocationPanel({ onFloor, onMapFix }: { onFloor: (floor: 
 
   function calibrate(floor: SensorFloor) {
     if (!fix || Date.now() - fix.timestamp > 15000) return;
+    setManualFloor(floor);
+    model.current = new FloorEstimator();
+    callback.current(floor);
     const ok = model.current.calibrate(floor, { altitude: fix.coords.altitude,
       accuracy: fix.coords.altitudeAccuracy, time: fix.timestamp });
-    setMessage(ok ? 'Floor reference calibrated.' : 'A more accurate altitude reading is needed.');
+    setMessage(ok ? 'Floor reference calibrated.' : 'Floor confirmed manually. More accurate altitude is needed for automatic transitions.');
     if (ok) callback.current(floor);
   }
 
   return <div>
     <button type="button" onClick={() => {
       if (!enabled) return start();
-      session.current++; setEnabled(false); setFix(null); setHeading(null); setMotion('');
+      session.current++; setAnchor(null); setManualFloor(2); setEnabled(false); setFix(null); setHeading(null); setMotion('');
       setMessage(''); model.current = new FloorEstimator();
     }}>{enabled ? 'Stop device tracking' : 'Track device location'}</button>
     {message && <p role="status">{message}</p>}
@@ -114,7 +121,12 @@ export default function LocationPanel({ onFloor, onMapFix }: { onFloor: (floor: 
     {fix && <p>Horizontal accuracy ±{Math.round(fix.coords.accuracy)} m · Altitude {fix.coords.altitude === null ? 'unavailable' : fix.coords.altitude.toFixed(1) + ' m'}</p>}
     {enabled && <p>{heading !== null ? motion + ' ' + Math.round(heading) % 360 + '°' :
       fix && (fix.coords.speed ?? 0) > 1 && fix.coords.heading !== null ? 'Travel direction ' + Math.round(fix.coords.heading) + '°' : motion.includes('permission') ? motion : 'Heading unavailable'}</p>}
-    {enabled && <p>Estimated floor {model.current.floor ?? 'unknown'} · {fix && model.current.confident ? 'calibrated estimate' : 'uncertain'}</p>}
+    {enabled && <p>Estimated floor {estimatedFloor} · {fix && model.current.confident ? 'calibrated estimate' : 'manual or last known'}</p>}
+    {fix && <button type="button" disabled={fix.coords.accuracy > 10} onClick={() => {
+      if (Date.now() - fix.timestamp > 15000) return;
+      setAnchor(fix.coords); calibrate(2);
+    }}>Set my position at Bethancourt center</button>}
+    {anchor && <p>Approximate north-up alignment from your center check-in.</p>}
     {fix && ([1,2] as const).map(floor => <button type="button" key={floor} onClick={() => calibrate(floor)}>Calibrate on Floor {floor}</button>)}
   </div>;
 }

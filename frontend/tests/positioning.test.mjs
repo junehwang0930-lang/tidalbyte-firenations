@@ -1,6 +1,6 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import { FloorEstimator, smoothHeading, projectFix } from '../src/positioning.ts';
+import { FloorEstimator, smoothHeading, projectFix, relativeFix } from '../src/positioning.ts';
 test('heading takes short arc across north', () => {
   assert.ok(smoothHeading(359,0)>359);
   assert.ok(smoothHeading(0,359)>359);
@@ -40,4 +40,18 @@ test('Bethancourt requires an unambiguous Level 2 section', async () => {
   }
   assert.equal(matchBethancourt({x:208,y:500,radius:4,floor:2},rooms),null);
   assert.equal(matchBethancourt(null,rooms),null);
+});
+
+test('ballroom check-in projects movement north and east on both floors', () => {
+  const anchor = { latitude: 30, longitude: -96, accuracy: 2 };
+  const moved = { ...anchor, latitude: 30 + 10 / 111320, longitude: -96 + 10 / (111320 * Math.cos(Math.PI / 6)) };
+  for (const floor of [1, 2]) {
+    const start = relativeFix(anchor, anchor, floor);
+    const fix = relativeFix(anchor, moved, floor);
+    if (floor === 2) assert.deepEqual([start.x, start.y], [264, 524]);
+    assert.ok(fix.x > start.x && fix.y < start.y);
+    assert.ok(fix.radius > 0);
+    assert.equal(relativeFix(anchor, { ...moved, accuracy: 40 }, floor), null);
+    assert.equal(relativeFix(anchor, { ...moved, latitude: 31 }, floor), null);
+  }
 });

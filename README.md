@@ -1,5 +1,8 @@
 # Fire Nations — TidalHack
 
+The [Wayfind demo guide](docs/atlas-mobile-integration.md) explains how to run
+the bundled Level 1/2 atlas, choose an ignition, and review a simulated route.
+
 Fire Nations is a predictive evacuation project designed for eventual use with
 authorized building data. The virtual detector network is the demo's primary
 mocked external data source. The planned algorithms use configurable layouts

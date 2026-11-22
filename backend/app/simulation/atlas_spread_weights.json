@@ -1,0 +1,12 @@
+{
+  "version": 1,
+  "model": "synthetic-grid-arrival-regression",
+  "feature": "walkable distance in demo units",
+  "smokeSecondsPerUnit": 1.096071,
+  "heatSecondsPerUnit": 4.078783,
+  "trainingSamples": 7070,
+  "syntheticHoldoutMAE": [
+    0.472,
+    1.403
+  ]
+}

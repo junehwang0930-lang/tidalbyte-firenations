@@ -34,7 +34,9 @@ export function describeRoute(route: GraphNode[], edges: GraphEdge[]) {
   return { exit, start, turn: 'straight' as Turn, distance: walk, toward: placeNames[exit.id] ?? 'the exit' };
 }
 
-export default function CameraPanel({ onClose, route, edges, expanded, onExpand }: {
+export default function CameraPanel({ onClose, route, edges, expanded, onExpand, floor = 1, endpointLabel }: {
+  floor?: number;
+  endpointLabel?: string;
   onClose: () => void;
   route: GraphNode[];
   edges: GraphEdge[];
@@ -48,7 +50,7 @@ export default function CameraPanel({ onClose, route, edges, expanded, onExpand 
   const [state, setState] = useState<CameraState>('starting');
   const [attempt, setAttempt] = useState(0);
   const step = describeRoute(route, edges);
-  const exitName = step ? placeNames[step.exit.id] ?? 'Exit' : '';
+  const exitName = step ? endpointLabel ?? placeNames[step.exit.id] ?? 'Exit' : '';
 
   useEffect(() => { handle.current?.focus(); }, []);
 
@@ -169,7 +171,7 @@ export default function CameraPanel({ onClose, route, edges, expanded, onExpand 
           <button type="button" className="ar-retry" onClick={() => setAttempt(attempt + 1)}>Try again</button>
         </div>}
         {step ? <>
-          <p className="ar-sub">Leave {placeNames[step.start.id] ?? 'this room'} · Floor 1</p>
+          <p className="ar-sub">Leave {placeNames[step.start.id] ?? 'this room'} · Floor {floor}</p>
           <p className="ar-main">
             In {Math.round(step.distance)} demo units <span className="ar-glyph" aria-hidden="true">{turnGlyph}</span>{' '}
             {step.turn === 'straight' ? `Continue to ${step.toward}` : `Turn ${step.turn} into ${step.toward}`}

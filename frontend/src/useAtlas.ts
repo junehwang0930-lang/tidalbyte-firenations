@@ -10,6 +10,23 @@ type Catalog = { rooms: { id: string; label: string }[]; defaultRoom: string };
 
 import type { MapFix } from './positioning';
 
+// Older mobile browsers support AbortController but lack AbortSignal.any/timeout.
+async function fetchJson<T>(url: string, parent: AbortSignal): Promise<T> {
+  const controller = new AbortController();
+  const abort = () => controller.abort();
+  parent.addEventListener('abort', abort, { once: true });
+  if (parent.aborted) abort();
+  const timeout = window.setTimeout(abort, 3000);
+  try {
+    const response = await fetch(url, { signal: controller.signal, cache: 'no-store' });
+    if (!response.ok) throw Error('Atlas request failed.');
+    return await response.json() as T;
+  } finally {
+    window.clearTimeout(timeout);
+    parent.removeEventListener('abort', abort);
+  }
+}
+
 export function useAtlas(device?: MapFix | null) {
   const [catalog, setCatalog] = useState<Catalog | null>(null);
   const [offline, setOffline] = useState(false);
@@ -29,10 +46,7 @@ export function useAtlas(device?: MapFix | null) {
   const requestId = useRef(0);
   useEffect(() => {
     const controller = new AbortController();
-    fetch('/api/floor-atlas/scenario/catalog', { signal: AbortSignal.any([controller.signal, AbortSignal.timeout(3000)]) }).then(async response => {
-      if (!response.ok) throw Error('Atlas unavailable. Start the demo backend on localhost.');
-      return response.json() as Promise<Catalog>;
-    }).catch(async reason => {
+    fetchJson<Catalog>('/api/floor-atlas/scenario/catalog', controller.signal).catch(async reason => {
       if (controller.signal.aborted) throw reason;
       const { offlineCatalog } = await import('./atlasOffline');
       if (!controller.signal.aborted) setOffline(true);
@@ -62,8 +76,7 @@ export function useAtlas(device?: MapFix | null) {
       setRoute(null); setError(''); setLoading(true);
       const request = offline || liveFloor
         ? import('./atlasOffline').then(({ offlineRoute }) => offlineRoute(origin, fire, elapsed, liveFloor && liveX !== undefined && liveY !== undefined && radius !== undefined ? {floor: liveFloor, x:liveX, y:liveY, radius} : undefined))
-        : fetch(`/api/floor-atlas/scenario/route?${query}`, { signal: AbortSignal.any([controller.signal, AbortSignal.timeout(3000)]), cache: 'no-store' })
-          .then(async response => { if (!response.ok) throw Error('Route unavailable. Clear/reset the scenario or check the backend.'); return response.json() as Promise<AtlasRoute>; })
+        : fetchJson<AtlasRoute>(`/api/floor-atlas/scenario/route?${query}`, controller.signal)
           .catch(async reason => {
             if (id !== requestId.current) throw reason;
             const { offlineRoute } = await import('./atlasOffline');

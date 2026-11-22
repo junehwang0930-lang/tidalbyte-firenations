@@ -7,10 +7,9 @@ Fire Nations is a predictive evacuation project designed for eventual use with
 authorized building data. The virtual detector network is the demo's primary
 mocked external data source. The planned algorithms use configurable layouts
 and detector placements to compute hazard estimates, forecasts, and routes.
-The demo requires live computed outputs in the web and mobile views.
-As detector readings change, both views should show the resulting hazard
-estimates, forecasts, and routes. The existing sample routes are placeholders
-until that integration is complete.
+The current atlas computes simulated smoke and heat spread and routes to a
+modeled exit. Detector-driven hazard estimation and Random Forest forecasting
+are planned.
 
 See the [six-phase machine learning roadmap](docs/ai-roadmap.md) for the
 replaceable detector interface, graph-based propagation, Python and scikit-learn
@@ -58,10 +57,12 @@ npm.cmd ci
 npm.cmd run dev
 ```
 
-Open http://127.0.0.1:5173 to view the fictional evacuation map. Floor 1 shows
-the simulated fire marker and sample routes. Floors 2 and 3 show floor plans.
-The frontend requests the graph from the backend and starts with the bundled
-fictional fixture, which also supports offline demos.
+Open http://127.0.0.1:5173 and expand **Simulation**. The demo starts at
+Bethancourt Ballroom on Level 2. Choose a **Simulated ignition** to see the
+route update as the modeled incident develops. Switch to Level 1 to see the
+continuation to the modeled exit when a route is available. The web app can
+use bundled maps and route calculations when the backend is unavailable.
+
 `npm.cmd` avoids Windows execution-policy issues with `npm.ps1`.
 
 Stop either server with Ctrl+C. API documentation: http://127.0.0.1:8000/docs.
@@ -79,7 +80,8 @@ npm.cmd run build
 ```
 
 The build runs TypeScript checking and writes the Vite bundle to `frontend/dist`.
-There is no frontend unit-test suite yet. Backend API, contract, and pathfinding
+Run `node --experimental-strip-types --test tests/positioning.test.mjs` from
+`frontend` to check positioning. Backend API, contract, and pathfinding
 tests use Pytest.
 With both servers running, verify direct and proxied HTTP/JSON:
 
@@ -118,8 +120,8 @@ backend/
   app/
     main.py                # shared startup and GET endpoints
     models.py              # authoritative Pydantic contract
-    routers/               # future HTTP feature adapters
-    simulation/            # reserved for Person 2
+    routers/               # HTTP feature endpoints
+    simulation/            # atlas smoke and heat propagation
     pathfinding/           # pure Python risk-weighted Dijkstra
   tests/                   # API, contract, and pathfinding tests
   pytest.ini
@@ -131,7 +133,7 @@ frontend/
     api/index.ts           # shared relative-URL HTTP client
     types/index.ts         # matching TypeScript interfaces
     components/            # floor map and camera panel
-    App.tsx                # floor picker and sample route visualization
+    App.tsx                # demo controls, floor picker and route visualization
     main.tsx
     style.css
   package.json
@@ -142,11 +144,8 @@ MobileApp/                 # MAUI shell bundling the shared frontend
 ```
 
 The backend implements risk-weighted Dijkstra as a standalone Python function.
-FastAPI serves health and graph endpoints, and the frontend uses sample routes.
-The [MAUI shell](MobileApp/README.md) bundles the frontend for offline demos.
-The detector pipeline, hazard simulator, 30- and 60-second fire and smoke
-forecasts, and live routing integration are planned. Start
-feature work from the reviewed setup on `main` and follow [AGENTS.md](AGENTS.md).
+FastAPI also serves atlas scenario and routing endpoints. The
+[MAUI shell](MobileApp/README.md) bundles the frontend for offline demos.
 
 ## Shared contract and fixture
 
@@ -156,7 +155,7 @@ feature work from the reviewed setup on `main` and follow [AGENTS.md](AGENTS.md)
   coordinate system. The fixture represents a fictional building.
 - `HazardSnapshot`: nonnegative simulated seconds, area IDs, nullable risk
   scores in [0,1], and blocked edge IDs. Null/omitted scores and absent areas
-  mean **unknown**, never zero. No hazard generator is included.
+  mean **unknown**, never zero.
 - `UserLocation`: selected demo `currentNodeId`.
 - `RouteResult`: `ok`, `no_route`, or `invalid_input`. Unavailable results use
   empty node/edge lists and null cost/exit. An `ok` result ends at `exitNodeId`
@@ -189,7 +188,12 @@ excluded by `.gitignore`.
 Use an HTTPS deployment with a certificate the phone trusts. Open Safari and
 tap **Track device location**. Grant Location and Motion & Orientation when
 prompted. Fire and smoke remain experimental simulations. Device readings stay
-in browser memory. Enable **Use device location for Bethancourt routes** to route from the anchor of a confidently matched section (2300A–E or the prefunction lobby). This requires verified Level 2 calibration, device tracking, and a confirmed floor. Turn the option off to select a room manually.
+in browser memory. Open **Simulation** and check in while standing at the
+center of Bethancourt Ballroom on Level 2. Tap **Set my position at Bethancourt
+center**, then enable **Route from my estimated position**. Check-in requires
+a fresh reading with reported horizontal accuracy of 10 meters or better.
+Choose **Use ballroom demo start** to resume the simulation from the default
+start if tracking drops.
 
 - Deny location and confirm the permission message. Enable access in Safari
   settings, stop tracking, restart it, and verify that accuracy updates.
@@ -207,14 +211,15 @@ in browser memory. Enable **Use device location for Bethancourt routes** to rout
 - Background Safari for more than 15 seconds, return, and check the freshness
   indicator. Stop tracking and confirm that device data disappears.
 
-The atlas contains schematic drawings. To enable geographic projection, enter
-three verified, non-collinear control points per floor in
-`data/floor-atlas/calibration.json`. Each point needs WGS84 `latitude` and
-`longitude` and the corresponding atlas `x` and `y` in the 1240 × 740 view.
-Check residual error against a fourth independently surveyed point before
-using the configuration. Leave the floor empty if that correspondence cannot
-be verified. Projection uses the surveyed triangle and displays a horizontal
-uncertainty radius. It supplies an estimated marker only.
+Both schematic plans use north-up orientation. The check-in estimates
+displacement using a footprint roughly 640 feet east–west by 410 feet
+north–south. The marker shows horizontal uncertainty. Indoor accuracy and
+alignment between floors still require on-site verification.
+
+A floor with three surveyed control points in
+`data/floor-atlas/calibration.json` uses geographic projection within their
+triangle. Each point pairs WGS84 latitude and longitude with an atlas position
+in the 1240 × 740 view. Verify accuracy against an independent fourth point.
 
 Run `node --experimental-strip-types --test tests/*.test.mjs` in `frontend`
 for the positioning checks. The physical-device checklist requires an iPhone.

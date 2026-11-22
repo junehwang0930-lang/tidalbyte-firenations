@@ -85,7 +85,7 @@ export default function App() {
         <RoomSelect label="Start on Level 2" value={atlas.origin} options={atlas.catalog.rooms} onChange={atlas.selectOrigin} />}
         <RoomSelect label="Simulated ignition" value={atlas.fire}
           options={[{ id: '', label: 'Clear (no fire)' }, ...atlas.catalog.rooms]} onChange={atlas.selectFire} />
-        <button type="button" onClick={() => { atlas.reset(); selectFloor(2); }}>Reset simulation</button>
+        <button type="button" onClick={() => { setLiveOrigin(false); atlas.reset(); selectFloor(2); }}>Reset simulation</button>
         {atlas.route?.forecast && <p>Incident +{atlas.route.forecast.elapsed}s · {atlas.route.forecast.horizon}s forecast · recomputes every 20s.</p>}
         {atlas.route && <p>{atlas.route.reason}</p>}
         {atlas.route?.assumedLanding && <p>Landing is assumed and unverified.</p>}

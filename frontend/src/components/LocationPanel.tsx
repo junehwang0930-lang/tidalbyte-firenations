@@ -23,8 +23,9 @@ export default function LocationPanel({ onFloor, onMapFix }: { onFloor: (floor: 
       ? projectFix(calibration[estimatedFloor], fix.coords.latitude, fix.coords.longitude, fix.coords.accuracy, estimatedFloor)
       : anchor && relativeFix(anchor, fix.coords, estimatedFloor);
     onMapFix(point ? { ...point, heading } : null);
-    return () => onMapFix(null);
+
   }, [anchor, fix, heading, estimatedFloor, onMapFix]);
+  useEffect(() => () => onMapFix(null), [onMapFix]);
 
   function start() {
     if (!window.isSecureContext || !navigator.geolocation) {
@@ -100,14 +101,12 @@ export default function LocationPanel({ onFloor, onMapFix }: { onFloor: (floor: 
   }, [enabled]);
 
   function calibrate(floor: SensorFloor) {
-    if (!fix || Date.now() - fix.timestamp > 15000) return;
     setManualFloor(floor);
     model.current = new FloorEstimator();
     callback.current(floor);
-    const ok = model.current.calibrate(floor, { altitude: fix.coords.altitude,
+    const ok = fix !== null && Date.now() - fix.timestamp <= 15000 && model.current.calibrate(floor, { altitude: fix.coords.altitude,
       accuracy: fix.coords.altitudeAccuracy, time: fix.timestamp });
     setMessage(ok ? 'Floor reference calibrated.' : 'Floor confirmed manually. More accurate altitude is needed for automatic transitions.');
-    if (ok) callback.current(floor);
   }
 
   return <div>
@@ -127,6 +126,6 @@ export default function LocationPanel({ onFloor, onMapFix }: { onFloor: (floor: 
       setAnchor(fix.coords); calibrate(2);
     }}>Set my position at Bethancourt center</button>}
     {anchor && <p>Approximate north-up alignment from your center check-in.</p>}
-    {fix && ([1,2] as const).map(floor => <button type="button" key={floor} onClick={() => calibrate(floor)}>Calibrate on Floor {floor}</button>)}
+    {enabled && ([1,2] as const).map(floor => <button type="button" key={floor} onClick={() => calibrate(floor)}>Confirm Floor {floor}</button>)}
   </div>;
 }

@@ -82,6 +82,11 @@ export default function App() {
           matched ? `Estimated room: ${atlas.catalog.rooms.find(room => room.id === matched)?.label ?? matched}. Route follows the estimated grid position.` :
             'Approximate device position. Routing uses modeled walkable paths.'}</p> :
         <RoomSelect label="Start on Level 2" value={atlas.origin} options={atlas.catalog.rooms} onChange={atlas.selectOrigin} />}
+        {liveOrigin && <button type="button" onClick={() => {
+          setLiveOrigin(false);
+          if (atlas.catalog) atlas.selectOrigin(atlas.catalog.defaultRoom);
+          selectFloor(2);
+        }}>Use ballroom demo start</button>}
         <RoomSelect label="Simulated ignition" value={atlas.fire}
           options={[{ id: '', label: 'Clear (no fire)' }, ...atlas.catalog.rooms]} onChange={atlas.selectFire} />
         <button type="button" onClick={() => { setLiveOrigin(false); atlas.reset(); selectFloor(2); }}>Reset simulation</button>

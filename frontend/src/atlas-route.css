@@ -1,7 +1,27 @@
 /* Atlas overlays inside the existing mobile dashboard and camera split view. */
-.atlas-simulation { display: grid; gap: 10px; padding: 16px; border-radius: 20px; background: var(--card); }
-.atlas-simulation p { margin: 0; color: var(--muted); font-size: .85rem; }
-.atlas-simulation button { min-height: 44px; padding: 10px; text-align: left; border-radius: 10px; background: var(--fill); }
+.atlas-simulation {
+  border: 1px solid var(--hairline); border-radius: 20px;
+  background: var(--card); box-shadow: 0 4px 14px rgb(80 0 0 / 8%);
+}
+.simulation-toggle {
+  display: flex; align-items: center; gap: 12px; padding: 12px;
+  border-radius: 20px; cursor: pointer; list-style: none;
+}
+.simulation-toggle::-webkit-details-marker { display: none; }
+.simulation-toggle:focus-visible { outline: 3px solid #d6a5a5; outline-offset: 2px; }
+.simulation-icon {
+  display: grid; place-items: center; width: 44px; height: 44px; flex-shrink: 0;
+  border-radius: 13px; background: var(--accent); color: var(--on-accent);
+}
+.simulation-label { display: grid; gap: 2px; min-width: 0; flex: 1; }
+.simulation-label small { color: var(--muted); font-size: .8125rem; }
+.simulation-chevron { color: var(--muted); transition: transform .2s; }
+.atlas-simulation[open] .simulation-chevron { transform: rotate(180deg); }
+.simulation-fields { display: grid; gap: 8px; padding: 0 12px 12px; }
+.simulation-fields button {
+  min-height: 44px; padding: 9px 12px; text-align: left; border-radius: 10px; background: var(--fill);
+}
+.simulation-fields .simulation-reset { background: transparent; color: var(--text); font-weight: 600; }
 .atlas-choice > button { width: 100%; }
 .atlas-options { display: grid; max-height: 240px; overflow-y: auto; gap: 4px; padding-top: 4px; }
 .atlas-options button[aria-pressed=true] { background: var(--accent); color: var(--on-accent); }
@@ -14,4 +34,5 @@
 .atlas-fire-area { fill: #e33b2f; fill-opacity: .43; stroke: #a71912; stroke-width: 2; vector-effect: non-scaling-stroke; }
 .camera-layout .atlas-simulation { display: none; }
 .camera-layout .atlas-drawing { width: min(100%, calc(30dvh * 1240 / 740)); margin: auto; }
-.full-map .atlas-overlay { background: transparent; max-width: none; border-radius: 0; }
+.full-map { container-type: size; }
+.full-map .atlas-drawing { width: min(100%, calc(100cqh * 1240 / 740)); margin: 0; }

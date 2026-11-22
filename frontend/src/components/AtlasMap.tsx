@@ -1,17 +1,20 @@
-import { useEffect, useId, useState } from 'react';
+import { useId, useState } from 'react';
 import type { AtlasRoute } from '../useAtlas';
+import levelOne from '../../../data/floor-atlas/level-1.svg?url';
+import levelTwo from '../../../data/floor-atlas/level-2.svg?url';
 
-export default function AtlasMap({ floor, route, onAvailability }: {
-  floor: number; route: AtlasRoute | null; onAvailability: (available: boolean) => void;
+export default function AtlasMap({ floor, route, offline, onAvailability }: {
+  floor: number; route: AtlasRoute | null; offline: boolean; onAvailability?: (available: boolean) => void;
 }) {
   const marker = useId();
-  const [failed, setFailed] = useState(false);
-  useEffect(() => { setFailed(false); onAvailability(false); }, [floor, onAvailability]);
+  const [image, setImage] = useState<'loading' | 'ready' | 'failed'>('loading');
   return <div className="atlas-drawing">
-    {failed && <p role="alert">This floor drawing is unavailable. No route guidance is shown.</p>}
-    <img key={floor} src={`/api/floor-atlas/${floor}`} alt={`Level ${floor} atlas drawing; unverified training layout`}
-      hidden={failed} onLoad={() => onAvailability(true)} onError={() => { setFailed(true); onAvailability(false); }} />
-    {!failed && route && <svg className="atlas-overlay" viewBox="0 0 1240 740" aria-hidden="true">
+    {image === 'failed' && <p role="alert">This floor drawing is unavailable. No route guidance is shown.</p>}
+    <img src={offline ? (floor === 1 ? levelOne : levelTwo) : `/api/floor-atlas/${floor}`}
+      alt={`Level ${floor} atlas drawing; unverified training layout`}
+      hidden={image === 'failed'} onLoad={() => { setImage('ready'); onAvailability?.(true); }}
+      onError={() => { setImage('failed'); onAvailability?.(false); }} />
+    {image === 'ready' && route && <svg className="atlas-overlay" viewBox="0 0 1240 740" aria-hidden="true">
       <defs><marker id={marker} viewBox="0 0 10 10" refX="9" refY="5" markerWidth="14" markerHeight="14"
         markerUnits="userSpaceOnUse" orient="auto"><path d="M0 0 10 5 0 10 2 5Z" fill="var(--accent)" /></marker></defs>
       {floor === 2 && route.forecast && <g fill="none" strokeWidth={route.forecast.cellSize}>

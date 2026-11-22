@@ -29,13 +29,19 @@ export default function App() {
     (atlas.route?.status === 'no_route' ? 'No simulated route available' :
       hasRoute ? (floor === 2 ? `Via stair ${atlas.route?.stair}` : atlas.route?.exitName ?? 'Modeled exit') :
         floorHasScenario ? 'No route on this floor' : 'Training map unavailable');
-  const map = floorHasScenario ? <AtlasMap floor={floor} route={atlas.route} onAvailability={setMapLoaded} /> :
-    <FloorMap floor={floor} route={[]} radius={0} fire={undefined} />;
-  const floorPicker = <FloorSelect floors={atlas.catalog ? [1, 2] : floors} value={floor}
-    onChange={value => { if (value !== floor) { setMapLoaded(false); setFloor(value); } }} />;
+  function selectFloor(value: Floor) {
+    if (value === floor) return;
+    setMapLoaded(false);
+    setFloor(value);
+  }
+  const renderMap = (onAvailability?: (available: boolean) => void) => floorHasScenario
+    ? <AtlasMap key={floor} floor={floor} route={atlas.route} offline={atlas.offline}
+        onAvailability={onAvailability} />
+    : <FloorMap floor={floor} route={[]} radius={0} fire={undefined} />;
+  const floorPicker = <FloorSelect floors={floors} value={floor} onChange={selectFloor} />;
   const legend = floorHasScenario
     ? 'Amber: predicted smoke · Orange: predicted heat · Red: ignition'
-    : 'Fictional preview only · New atlas assets unavailable · No routing';
+    : 'Fictional preview only · No atlas routing on this floor';
 
   useEffect(() => { if (atlas.error) setAnnouncement(atlas.error); }, [atlas.error]);
   function refreshRoute() {
@@ -65,7 +71,7 @@ export default function App() {
         <RoomSelect label="Start on Level 2" value={atlas.origin} options={atlas.catalog.rooms} onChange={atlas.selectOrigin} />
         <RoomSelect label="Simulated ignition" value={atlas.fire}
           options={[{ id: '', label: 'Clear (no fire)' }, ...atlas.catalog.rooms]} onChange={atlas.selectFire} />
-        <button type="button" onClick={() => { atlas.reset(); setFloor(2); }}>Reset simulation</button>
+        <button type="button" onClick={() => { atlas.reset(); selectFloor(2); }}>Reset simulation</button>
         {atlas.route?.forecast && <p>Incident +{atlas.route.forecast.elapsed}s · {atlas.route.forecast.horizon}s forecast · recomputes every 20s.</p>}
         {atlas.route && <p>{atlas.route.reason}</p>}
         {atlas.route?.assumedLanding && <p>Landing is assumed and unverified.</p>}
@@ -76,7 +82,7 @@ export default function App() {
           <span className="sr-only">Refresh route</span></button>}</div>
         <button type="button" className="map-trigger" aria-label="Open full-screen floor plan"
           onClick={() => mapDialog.current?.showModal()}>
-          {map}<svg className="expand icon" viewBox="0 0 24 24" aria-hidden="true">
+          {renderMap(setMapLoaded)}<svg className="expand icon" viewBox="0 0 24 24" aria-hidden="true">
             <path d="M14 4h6v6M20 4l-6 6M10 20H4v-6m0 6 6-6" />
           </svg>
         </button>
@@ -96,7 +102,7 @@ export default function App() {
         <header className="dialog-header"><h2 id="map-title" className="sr-only">Full-screen floor plan</h2>{floorPicker}
           <button className="pill" type="button" onClick={() => mapDialog.current?.close()}>Done</button>
         </header>
-        <div className="full-map">{map}</div>
+        <div className="full-map">{renderMap()}</div>
         <div className="legend">{legend}</div>
         <footer>Simulation only · Fictional floor plan</footer>
       </dialog>

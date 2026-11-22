@@ -10,6 +10,7 @@ type Catalog = { rooms: { id: string; label: string }[]; defaultRoom: string };
 
 export function useAtlas() {
   const [catalog, setCatalog] = useState<Catalog | null>(null);
+  const [offline, setOffline] = useState(false);
   const [origin, setOrigin] = useState('');
   const [fire, setFire] = useState('');
   const [route, setRoute] = useState<AtlasRoute | null>(null);
@@ -23,8 +24,17 @@ export function useAtlas() {
     fetch('/api/floor-atlas/scenario/catalog', { signal: controller.signal }).then(async response => {
       if (!response.ok) throw Error('Atlas unavailable. Start the demo backend on localhost.');
       return response.json() as Promise<Catalog>;
-    }).then(result => { setCatalog(result); setOrigin(result.defaultRoom); setError(''); })
-      .catch(reason => { if (!controller.signal.aborted) setError(String(reason.message)); });
+    }).catch(async reason => {
+      if (controller.signal.aborted) throw reason;
+      const { offlineCatalog } = await import('./atlasOffline');
+      if (!controller.signal.aborted) setOffline(true);
+      return offlineCatalog();
+    }).then(result => {
+      if (controller.signal.aborted) return;
+      setCatalog(result); setOrigin(result.defaultRoom); setError('');
+    }).catch(() => {
+      if (!controller.signal.aborted) setError('Training atlas unavailable.');
+    });
     return () => controller.abort();
   }, []);
   useEffect(() => {
@@ -37,12 +47,16 @@ export function useAtlas() {
       controller = new AbortController();
       const id = ++requestId.current;
       const age = ignition.current === null ? 0 : Math.max(0, Date.now() - ignition.current);
-      const query = new URLSearchParams({ origin, elapsed: String(Math.floor(age / 1000)) });
+      const elapsed = Math.min(86400, Math.floor(age / 1000));
+      const query = new URLSearchParams({ origin, elapsed: String(elapsed) });
       if (fire) query.set('fire', fire);
       if (fire && age < 86400000) timer = window.setTimeout(calculate, 20000 - age % 20000);
       setRoute(null); setError(''); setLoading(true);
-      fetch(`/api/floor-atlas/scenario/route?${query}`, { signal: controller.signal, cache: 'no-store' })
-        .then(async response => { if (!response.ok) throw Error('Route unavailable. Clear/reset the scenario or check the backend.'); return response.json() as Promise<AtlasRoute>; })
+      const request = offline
+        ? import('./atlasOffline').then(({ offlineRoute }) => offlineRoute(origin, fire, elapsed))
+        : fetch(`/api/floor-atlas/scenario/route?${query}`, { signal: controller.signal, cache: 'no-store' })
+          .then(async response => { if (!response.ok) throw Error('Route unavailable. Clear/reset the scenario or check the backend.'); return response.json() as Promise<AtlasRoute>; });
+      request
         .then(result => { if (id === requestId.current) setRoute(result); })
         .catch(reason => { if (id === requestId.current && !controller.signal.aborted) setError(reason.message); })
         .finally(() => { if (id === requestId.current) setLoading(false); });
@@ -50,9 +64,9 @@ export function useAtlas() {
     const resume = () => { if (document.visibilityState === 'visible') calculate(); };
     calculate(); document.addEventListener('visibilitychange', resume);
     return () => { ++requestId.current; controller?.abort(); window.clearTimeout(timer); document.removeEventListener('visibilitychange', resume); };
-  }, [origin, fire, version]);
+  }, [origin, fire, version, offline]);
   const invalidate = () => { ++requestId.current; setRoute(null); setError(''); };
-  return { catalog, origin, fire, route, error, loading,
+  return { catalog, offline, origin, fire, route, error, loading,
     selectOrigin: (value: string) => { invalidate(); setOrigin(value); setVersion(v => v + 1); },
     selectFire: (value: string) => { invalidate(); ignition.current = value ? Date.now() : null; setFire(value); setVersion(v => v + 1); },
     refresh: () => { invalidate(); setVersion(v => v + 1); },

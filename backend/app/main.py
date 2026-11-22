@@ -17,8 +17,9 @@ GRAPH_PATH = Path(__file__).resolve().parents[2] / 'data' / 'building.json'
 async def lifespan(app: FastAPI):
     # Fail at startup if the shared fixture violates the contract.
     app.state.graph = BuildingGraph.model_validate_json(GRAPH_PATH.read_text(encoding='utf-8'))
-    folder = GRAPH_PATH.parent.parent / '.wayfind-local' / 'floor-atlas'
-    app.state.atlas = folder if os.getenv('WAYFIND_LOCAL') == '1' and folder.is_dir() else None
+    local = GRAPH_PATH.parent.parent / '.wayfind-local' / 'floor-atlas'
+    folder = local if os.getenv('WAYFIND_LOCAL') == '1' else GRAPH_PATH.parent / 'floor-atlas'
+    app.state.atlas = folder if folder.is_dir() else None
     scenario = folder / 'scenario.json'
     app.state.atlas_scenario = AtlasScenario.load(scenario) if app.state.atlas and scenario.is_file() else None
     yield

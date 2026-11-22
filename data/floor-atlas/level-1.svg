@@ -1,0 +1,286 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1240 740" role="img">
+<title>Level 1 — Memorial Student Center whole-floor review</title><desc>Interpretive whole-floor drawing for visual review; dimensions and circulation are approximate.</desc>
+<defs><pattern id="void" width="9" height="9" patternUnits="userSpaceOnUse"><rect width="9" height="9" fill="#eef1ed"/><path d="M-2 2l4-4m-2 11 9-9m-2 11 4-4" fill="none" stroke="#d8dfd8" stroke-width=".8"/></pattern>
+<pattern id="context" width="7" height="7" patternUnits="userSpaceOnUse"><rect width="7" height="7" fill="#f2f1ed"/><circle cx="3" cy="3" r=".65" fill="#cecdc5"/></pattern></defs>
+<style>path,rect{stroke-linejoin:round}text{font-family:Arial,Helvetica,sans-serif;text-anchor:middle;fill:#303c36}.minor{font-size:12px}.small{font-size:14px}.normal{font-size:17px}.major{font-size:22px;font-weight:600}.focus{fill:#28513c}.muted{fill:#5d6960}</style>
+<path d="M68 72H428V53H479V43H524V52H615V67H859V96H913V160H951V109H1072V78H1159V93H1180V583H1100V615H1050V644H620V668H402V677H372V648H153V673H106V661H72V621H50V581H56V461H32V410H54V194H68Z" fill="#fbfaf6" stroke="#434b43" stroke-width="3" />
+<path d="M79 79H412V163H82V151H69V95H79Z" fill="#e4e9e0" stroke="#686e65" stroke-width="1.6" />
+<text x="241" y="114" class="normal "><tspan x="241" dy="0">Veteran Resource &amp; Support Center</tspan></text>
+<text x="241" y="137" class="minor muted"><tspan x="241" dy="0">West wing</tspan></text>
+<path d="M81 166H185V196H206V397H177V413H81Z" fill="url(#context)" stroke="#686e65" stroke-width="1.6" />
+<text x="137" y="279" class="small muted"><tspan x="137" dy="0">West side</tspan></text>
+<path d="M209 172H385V390H351V402H213Z" fill="url(#void)" stroke="#686e65" stroke-width="1.6" />
+<text x="298" y="280" class="normal muted"><tspan x="298" dy="0">Forster</tspan></text>
+<text x="298" y="303" class="normal muted"><tspan x="298" dy="0">Courtyard</tspan></text>
+<path d="M418 87H492V120H418Z" fill="#e6e6df" stroke="#686e65" stroke-width="1.6" />
+<path d="M493 87H538V120H493Z" fill="#e6e6df" stroke="#686e65" stroke-width="1.6" />
+<text x="477" y="81" class="minor "><tspan x="477" dy="0">Veterans’ offices</tspan></text>
+<path d="M548 55h65v48h-65Z" fill="#e4e9e0" stroke="#686e65" stroke-width="1.6" />
+<text x="581" y="76" class="minor "><tspan x="581" dy="0">Honor</tspan></text>
+<text x="581" y="90" class="minor "><tspan x="581" dy="0">Entrance</tspan></text>
+<text x="728" y="115" class="normal "><tspan x="728" dy="0">Hall of Honor</tspan></text>
+<path d="M471 139H643V201H471Z" fill="#e6e6df" stroke="#686e65" stroke-width="1.6" />
+<text x="558" y="175" class="small "><tspan x="558" dy="0">Veterans Lounge</tspan></text>
+<path d="M471 207h56v37h-56Z" fill="#e4e9e0" stroke="#686e65" stroke-width="1.6" />
+<text x="499" y="230" class="minor "><tspan x="499" dy="0">1401</tspan></text>
+<path d="M527 207h56v37h-56Z" fill="#e4e9e0" stroke="#686e65" stroke-width="1.6" />
+<text x="555" y="230" class="minor "><tspan x="555" dy="0">1402</tspan></text>
+<path d="M583 207h56v37h-56Z" fill="#e4e9e0" stroke="#686e65" stroke-width="1.6" />
+<text x="611" y="230" class="minor "><tspan x="611" dy="0">1403</tspan></text>
+<path d="M471 244h56v70h-56Z" fill="#e4e9e0" stroke="#686e65" stroke-width="1.6" />
+<text x="499" y="284" class="minor "><tspan x="499" dy="0">1400</tspan></text>
+<path d="M531 253H650V207H766V329H532Z" fill="#e6e6df" stroke="#686e65" stroke-width="1.6" />
+<text x="646" y="293" class="normal "><tspan x="646" dy="0">Food court</tspan></text>
+<path d="M471 340H766V404H471Z" fill="#e6e6df" stroke="#686e65" stroke-width="1.6" />
+<text x="619" y="378" class="small "><tspan x="619" dy="0">Dining lounge / eatery</tspan></text>
+<path d="M657 139H766V197H657Z" fill="url(#context)" stroke="#686e65" stroke-width="1.6" />
+<path d="M422 127h29v36h-29Z" fill="url(#context)" stroke="#686e65" stroke-width="1.6" />
+<path d="M805 163h47v36h-47Z" fill="url(#context)" stroke="#686e65" stroke-width="1.6" />
+<path d="M798 235H889V322H914V407H798Z" fill="#e6e6df" stroke="#686e65" stroke-width="1.6" />
+<text x="852" y="318" class="normal "><tspan x="852" dy="0">Flag Room</tspan></text>
+<path d="M939 159H967V114H1079V131H1117V261H1089V355H939Z" fill="#e6e6df" stroke="#686e65" stroke-width="1.6" />
+<text x="1029" y="222" class="normal "><tspan x="1029" dy="0">J. Wayne Stark</tspan><tspan x="1029" dy="17">Galleries</tspan></text>
+<text x="1118" y="416" class="minor "><tspan x="1118" dy="0">12th Man</tspan><tspan x="1118" dy="17">Hall</tspan></text>
+<path d="M80 441H173V424H295V438H338V529H256V582H101V568H81Z" fill="url(#context)" stroke="#686e65" stroke-width="1.6" />
+<text x="201" y="508" class="small muted"><tspan x="201" dy="0">West wing spaces</tspan></text>
+<path d="M82 583H334V611H82Z" fill="#e6e6df" stroke="#686e65" stroke-width="1.6" />
+<text x="208" y="602" class="minor "><tspan x="208" dy="0">Retail / service spaces</tspan></text>
+<path d="M358 432h58v161h-58Z" fill="url(#context)" stroke="#686e65" stroke-width="1.6" />
+<text x="387" y="495" class="minor "><tspan x="387" dy="0">Respect</tspan><tspan x="387" dy="17">Lounge</tspan></text>
+<path d="M470 459H635V447H754V454H847V444H942V611H765V619H472Z" fill="#e6e6df" stroke="#686e65" stroke-width="1.6" />
+<text x="715" y="530" class="major "><tspan x="715" dy="0">Barnes &amp; Noble</tspan></text>
+<text x="715" y="552" class="small "><tspan x="715" dy="0">Café / Aggie Stop</tspan></text>
+<path d="M946 446H1082V545H1051V602H946Z" fill="#e6e6df" stroke="#686e65" stroke-width="1.6" />
+<text x="1005" y="525" class="normal "><tspan x="1005" dy="0">Dining</tspan></text>
+<text x="642" y="430" class="small muted"><tspan x="642" dy="0">Main concourse</tspan></text>
+<path d="M680 453h52v23h-52Z" fill="url(#context)" stroke="#686e65" stroke-width="1.6" />
+<text x="942" y="682" class="minor muted"><tspan x="942" dy="0">Schematic · not to scale</tspan></text>
+<g id="doors"><title>Door openings visible on the detailed plans</title>
+<g id="door-1-1" transform="translate(565 55) rotate(0)"><title>Honor outer doors west · schematic opening</title>
+<path d="M-6 0H6" fill="none" stroke="#fbfaf6" stroke-width="4" />
+<path d="M-6 -2.5v5 M6 -2.5v5 M-6 0H6" fill="none" stroke="#377782" stroke-width="1.1" />
+<path d="M0 -1.8v3.6" fill="none" stroke="#377782" stroke-width="0.9" />
+</g>
+<g id="door-1-2" transform="translate(591 55) rotate(0)"><title>Honor outer doors east · schematic opening</title>
+<path d="M-6 0H6" fill="none" stroke="#fbfaf6" stroke-width="4" />
+<path d="M-6 -2.5v5 M6 -2.5v5 M-6 0H6" fill="none" stroke="#377782" stroke-width="1.1" />
+<path d="M0 -1.8v3.6" fill="none" stroke="#377782" stroke-width="0.9" />
+</g>
+<g id="door-1-3" transform="translate(563 103) rotate(0)"><title>Honor inner vestibule west · schematic opening</title>
+<path d="M-6 0H6" fill="none" stroke="#fbfaf6" stroke-width="4" />
+<path d="M-6 -2.5v5 M6 -2.5v5 M-6 0H6" fill="none" stroke="#377782" stroke-width="1.1" />
+<path d="M0 -1.8v3.6" fill="none" stroke="#377782" stroke-width="0.9" />
+</g>
+<g id="door-1-4" transform="translate(594 103) rotate(0)"><title>Honor inner vestibule east · schematic opening</title>
+<path d="M-6 0H6" fill="none" stroke="#fbfaf6" stroke-width="4" />
+<path d="M-6 -2.5v5 M6 -2.5v5 M-6 0H6" fill="none" stroke="#377782" stroke-width="1.1" />
+<path d="M0 -1.8v3.6" fill="none" stroke="#377782" stroke-width="0.9" />
+</g>
+<g id="door-1-5" transform="translate(613 76) rotate(90)"><title>Honor vestibule side door · schematic opening</title>
+<path d="M-4 0H4" fill="none" stroke="#fbfaf6" stroke-width="4" />
+<path d="M-4 -2.5v5 M4 -2.5v5 M-4 0H4" fill="none" stroke="#377782" stroke-width="1.1" />
+</g>
+<g id="door-1-6" transform="translate(471 225) rotate(90)"><title>1401 west door · schematic opening</title>
+<path d="M-6 0H6" fill="none" stroke="#fbfaf6" stroke-width="4" />
+<path d="M-6 -2.5v5 M6 -2.5v5 M-6 0H6" fill="none" stroke="#377782" stroke-width="1.1" />
+<path d="M0 -1.8v3.6" fill="none" stroke="#377782" stroke-width="0.9" />
+</g>
+<g id="door-1-7" transform="translate(471 292) rotate(90)"><title>1400 west door · schematic opening</title>
+<path d="M-6 0H6" fill="none" stroke="#fbfaf6" stroke-width="4" />
+<path d="M-6 -2.5v5 M6 -2.5v5 M-6 0H6" fill="none" stroke="#377782" stroke-width="1.1" />
+<path d="M0 -1.8v3.6" fill="none" stroke="#377782" stroke-width="0.9" />
+</g>
+<g id="door-1-8" transform="translate(527 253) rotate(90)"><title>1400 east door · schematic opening</title>
+<path d="M-6 0H6" fill="none" stroke="#fbfaf6" stroke-width="4" />
+<path d="M-6 -2.5v5 M6 -2.5v5 M-6 0H6" fill="none" stroke="#377782" stroke-width="1.1" />
+<path d="M0 -1.8v3.6" fill="none" stroke="#377782" stroke-width="0.9" />
+</g>
+<g id="door-1-9" transform="translate(562 244) rotate(0)"><title>1402 south door · schematic opening</title>
+<path d="M-4 0H4" fill="none" stroke="#fbfaf6" stroke-width="4" />
+<path d="M-4 -2.5v5 M4 -2.5v5 M-4 0H4" fill="none" stroke="#377782" stroke-width="1.1" />
+</g>
+<g id="door-1-10" transform="translate(527 237) rotate(90)"><title>1402 west side · schematic opening</title>
+<path d="M-6 0H6" fill="none" stroke="#fbfaf6" stroke-width="4" />
+<path d="M-6 -2.5v5 M6 -2.5v5 M-6 0H6" fill="none" stroke="#377782" stroke-width="1.1" />
+<path d="M0 -1.8v3.6" fill="none" stroke="#377782" stroke-width="0.9" />
+</g>
+<g id="door-1-11" transform="translate(639 225) rotate(90)"><title>1403 east side · schematic opening</title>
+<path d="M-6 0H6" fill="none" stroke="#fbfaf6" stroke-width="4" />
+<path d="M-6 -2.5v5 M6 -2.5v5 M-6 0H6" fill="none" stroke="#377782" stroke-width="1.1" />
+<path d="M0 -1.8v3.6" fill="none" stroke="#377782" stroke-width="0.9" />
+</g>
+<g id="door-1-12" transform="translate(583 236) rotate(90)"><title>1403 west side · schematic opening</title>
+<path d="M-6 0H6" fill="none" stroke="#fbfaf6" stroke-width="4" />
+<path d="M-6 -2.5v5 M6 -2.5v5 M-6 0H6" fill="none" stroke="#377782" stroke-width="1.1" />
+<path d="M0 -1.8v3.6" fill="none" stroke="#377782" stroke-width="0.9" />
+</g>
+<g id="door-1-13" transform="translate(600 207) rotate(0)"><title>1403 north door · schematic opening</title>
+<path d="M-6 0H6" fill="none" stroke="#fbfaf6" stroke-width="4" />
+<path d="M-6 -2.5v5 M6 -2.5v5 M-6 0H6" fill="none" stroke="#377782" stroke-width="1.1" />
+<path d="M0 -1.8v3.6" fill="none" stroke="#377782" stroke-width="0.9" />
+</g>
+<g id="door-1-14" transform="translate(565 201) rotate(0)"><title>Veterans Lounge south doors · schematic opening</title>
+<path d="M-6 0H6" fill="none" stroke="#fbfaf6" stroke-width="4" />
+<path d="M-6 -2.5v5 M6 -2.5v5 M-6 0H6" fill="none" stroke="#377782" stroke-width="1.1" />
+<path d="M0 -1.8v3.6" fill="none" stroke="#377782" stroke-width="0.9" />
+</g>
+<g id="door-1-15" transform="translate(643 157) rotate(90)"><title>Veterans Lounge east door · schematic opening</title>
+<path d="M-4 0H4" fill="none" stroke="#fbfaf6" stroke-width="4" />
+<path d="M-4 -2.5v5 M4 -2.5v5 M-4 0H4" fill="none" stroke="#377782" stroke-width="1.1" />
+</g>
+<g id="door-1-16" transform="translate(553 253) rotate(0)"><title>Food court north doors west · schematic opening</title>
+<path d="M-6 0H6" fill="none" stroke="#fbfaf6" stroke-width="4" />
+<path d="M-6 -2.5v5 M6 -2.5v5 M-6 0H6" fill="none" stroke="#377782" stroke-width="1.1" />
+<path d="M0 -1.8v3.6" fill="none" stroke="#377782" stroke-width="0.9" />
+</g>
+<g id="door-1-17" transform="translate(611 253) rotate(0)"><title>Food court north doors east · schematic opening</title>
+<path d="M-6 0H6" fill="none" stroke="#fbfaf6" stroke-width="4" />
+<path d="M-6 -2.5v5 M6 -2.5v5 M-6 0H6" fill="none" stroke="#377782" stroke-width="1.1" />
+<path d="M0 -1.8v3.6" fill="none" stroke="#377782" stroke-width="0.9" />
+</g>
+<g id="door-1-18" transform="translate(806 188) rotate(90)"><title>Level 1 stair G return · schematic opening</title>
+<path d="M-4 0H4" fill="none" stroke="#fbfaf6" stroke-width="4" />
+<path d="M-4 -2.5v5 M4 -2.5v5 M-4 0H4" fill="none" stroke="#377782" stroke-width="1.1" />
+</g>
+<g id="door-1-19" transform="translate(853 407) rotate(0)"><title>Flag Room south doors · schematic opening</title>
+<path d="M-6 0H6" fill="none" stroke="#fbfaf6" stroke-width="4" />
+<path d="M-6 -2.5v5 M6 -2.5v5 M-6 0H6" fill="none" stroke="#377782" stroke-width="1.1" />
+<path d="M0 -1.8v3.6" fill="none" stroke="#377782" stroke-width="0.9" />
+</g>
+</g><g id="stair-review"><title>Stair review IDs; ? means projected only</title>
+<g id="stair-W" data-status="projected"><title>West end beside WW2507 · projected only; no landing established here</title>
+<path d="M82 108h14v18h-14Z" fill="#f4f3ec" stroke="#686e65" stroke-width="1.6" />
+<path d="M83 110.6h12" fill="none" stroke="#92978b" stroke-width="0.9" />
+<path d="M83 113.1h12" fill="none" stroke="#92978b" stroke-width="0.9" />
+<path d="M83 115.7h12" fill="none" stroke="#92978b" stroke-width="0.9" />
+<path d="M83 118.3h12" fill="none" stroke="#92978b" stroke-width="0.9" />
+<path d="M83 120.9h12" fill="none" stroke="#92978b" stroke-width="0.9" />
+<path d="M83 123.4h12" fill="none" stroke="#92978b" stroke-width="0.9" />
+<text x="102" y="106" style="font:600 10px Arial;fill:#8c4e1d;stroke:#fbfaf6;stroke-width:3px;paint-order:stroke">W?</text></g>
+<g id="stair-F" data-status="drawn"><title>West prefunction stair F; possible Level 1 west core · source symbol; counterpart unconfirmed</title>
+<path d="M424 136h14v18h-14Z" fill="#f4f3ec" stroke="#686e65" stroke-width="1.6" />
+<path d="M425 138.6h12" fill="none" stroke="#92978b" stroke-width="0.9" />
+<path d="M425 141.1h12" fill="none" stroke="#92978b" stroke-width="0.9" />
+<path d="M425 143.7h12" fill="none" stroke="#92978b" stroke-width="0.9" />
+<path d="M425 146.3h12" fill="none" stroke="#92978b" stroke-width="0.9" />
+<path d="M425 148.9h12" fill="none" stroke="#92978b" stroke-width="0.9" />
+<path d="M425 151.4h12" fill="none" stroke="#92978b" stroke-width="0.9" />
+<text x="413" y="152" style="font:600 10px Arial;fill:#423f38;stroke:#fbfaf6;stroke-width:3px;paint-order:stroke">F</text></g>
+<g id="stair-C" data-status="projected"><title>West / main sheet-overlap core; check whether a separate flight · projected only; no landing established here</title>
+<path d="M434 75h14v18h-14Z" fill="#f4f3ec" stroke="#686e65" stroke-width="1.6" />
+<path d="M435 77.6h12" fill="none" stroke="#92978b" stroke-width="0.9" />
+<path d="M435 80.1h12" fill="none" stroke="#92978b" stroke-width="0.9" />
+<path d="M435 82.7h12" fill="none" stroke="#92978b" stroke-width="0.9" />
+<path d="M435 85.3h12" fill="none" stroke="#92978b" stroke-width="0.9" />
+<path d="M435 87.9h12" fill="none" stroke="#92978b" stroke-width="0.9" />
+<path d="M435 90.4h12" fill="none" stroke="#92978b" stroke-width="0.9" />
+<text x="430" y="70" style="font:600 10px Arial;fill:#8c4e1d;stroke:#fbfaf6;stroke-width:3px;paint-order:stroke">C?</text></g>
+<g id="stair-N" data-status="drawn"><title>North stair; historical A callout is not an official stair ID · source symbol; counterpart unconfirmed</title>
+<path d="M535 84h14v18h-14Z" fill="#f4f3ec" stroke="#686e65" stroke-width="1.6" />
+<path d="M536 86.6h12" fill="none" stroke="#92978b" stroke-width="0.9" />
+<path d="M536 89.1h12" fill="none" stroke="#92978b" stroke-width="0.9" />
+<path d="M536 91.7h12" fill="none" stroke="#92978b" stroke-width="0.9" />
+<path d="M536 94.3h12" fill="none" stroke="#92978b" stroke-width="0.9" />
+<path d="M536 96.9h12" fill="none" stroke="#92978b" stroke-width="0.9" />
+<path d="M536 99.4h12" fill="none" stroke="#92978b" stroke-width="0.9" />
+<text x="535" y="116" style="font:600 10px Arial;fill:#423f38;stroke:#fbfaf6;stroke-width:3px;paint-order:stroke">N</text></g>
+<g id="stair-G" data-status="drawn"><title>East stair G, name shown on both detail sheets · source symbol; counterpart unconfirmed</title>
+<path d="M811 172h14v18h-14Z" fill="#f4f3ec" stroke="#686e65" stroke-width="1.6" />
+<path d="M812 174.6h12" fill="none" stroke="#92978b" stroke-width="0.9" />
+<path d="M812 177.1h12" fill="none" stroke="#92978b" stroke-width="0.9" />
+<path d="M812 179.7h12" fill="none" stroke="#92978b" stroke-width="0.9" />
+<path d="M812 182.3h12" fill="none" stroke="#92978b" stroke-width="0.9" />
+<path d="M812 184.9h12" fill="none" stroke="#92978b" stroke-width="0.9" />
+<path d="M812 187.4h12" fill="none" stroke="#92978b" stroke-width="0.9" />
+<text x="831" y="171" style="font:600 10px Arial;fill:#423f38;stroke:#fbfaf6;stroke-width:3px;paint-order:stroke">G</text></g>
+<g id="stair-BW" data-status="projected"><title>Bethancourt west lobby stair · projected only; no landing established here</title>
+<path d="M74 622h14v18h-14Z" fill="#f4f3ec" stroke="#686e65" stroke-width="1.6" />
+<path d="M75 624.6h12" fill="none" stroke="#92978b" stroke-width="0.9" />
+<path d="M75 627.1h12" fill="none" stroke="#92978b" stroke-width="0.9" />
+<path d="M75 629.7h12" fill="none" stroke="#92978b" stroke-width="0.9" />
+<path d="M75 632.3h12" fill="none" stroke="#92978b" stroke-width="0.9" />
+<path d="M75 634.9h12" fill="none" stroke="#92978b" stroke-width="0.9" />
+<path d="M75 637.4h12" fill="none" stroke="#92978b" stroke-width="0.9" />
+<text x="94" y="621" style="font:600 10px Arial;fill:#8c4e1d;stroke:#fbfaf6;stroke-width:3px;paint-order:stroke">BW?</text></g>
+<g id="stair-BS" data-status="projected"><title>Bethancourt south prefunction stair · projected only; no landing established here</title>
+<path d="M385 651h14v18h-14Z" fill="#f4f3ec" stroke="#686e65" stroke-width="1.6" />
+<path d="M386 653.6h12" fill="none" stroke="#92978b" stroke-width="0.9" />
+<path d="M386 656.1h12" fill="none" stroke="#92978b" stroke-width="0.9" />
+<path d="M386 658.7h12" fill="none" stroke="#92978b" stroke-width="0.9" />
+<path d="M386 661.3h12" fill="none" stroke="#92978b" stroke-width="0.9" />
+<path d="M386 663.9h12" fill="none" stroke="#92978b" stroke-width="0.9" />
+<path d="M386 666.4h12" fill="none" stroke="#92978b" stroke-width="0.9" />
+<text x="405" y="650" style="font:600 10px Arial;fill:#8c4e1d;stroke:#fbfaf6;stroke-width:3px;paint-order:stroke">BS?</text></g>
+<g id="stair-BE" data-status="projected"><title>Bethancourt east-side flight · projected only; no landing established here</title>
+<path d="M421 579h14v18h-14Z" fill="#f4f3ec" stroke="#686e65" stroke-width="1.6" />
+<path d="M422 581.6h12" fill="none" stroke="#92978b" stroke-width="0.9" />
+<path d="M422 584.1h12" fill="none" stroke="#92978b" stroke-width="0.9" />
+<path d="M422 586.7h12" fill="none" stroke="#92978b" stroke-width="0.9" />
+<path d="M422 589.3h12" fill="none" stroke="#92978b" stroke-width="0.9" />
+<path d="M422 591.9h12" fill="none" stroke="#92978b" stroke-width="0.9" />
+<path d="M422 594.4h12" fill="none" stroke="#92978b" stroke-width="0.9" />
+<text x="442" y="585" style="font:600 10px Arial;fill:#8c4e1d;stroke:#fbfaf6;stroke-width:3px;paint-order:stroke">BE?</text></g>
+<g id="stair-WC" data-status="projected"><title>West outer circulation flight, Level 2 directory · projected only; no landing established here</title>
+<path d="M32 405h14v18h-14Z" fill="#f4f3ec" stroke="#686e65" stroke-width="1.6" />
+<path d="M33 407.6h12" fill="none" stroke="#92978b" stroke-width="0.9" />
+<path d="M33 410.1h12" fill="none" stroke="#92978b" stroke-width="0.9" />
+<path d="M33 412.7h12" fill="none" stroke="#92978b" stroke-width="0.9" />
+<path d="M33 415.3h12" fill="none" stroke="#92978b" stroke-width="0.9" />
+<path d="M33 417.9h12" fill="none" stroke="#92978b" stroke-width="0.9" />
+<path d="M33 420.4h12" fill="none" stroke="#92978b" stroke-width="0.9" />
+<text x="52" y="404" style="font:600 10px Arial;fill:#8c4e1d;stroke:#fbfaf6;stroke-width:3px;paint-order:stroke">WC?</text></g>
+<g id="stair-SC" data-status="drawn"><title>South concourse flight, directory comparison only · source symbol; counterpart unconfirmed</title>
+<path d="M825 449h14v18h-14Z" fill="#f4f3ec" stroke="#686e65" stroke-width="1.6" />
+<path d="M826 451.6h12" fill="none" stroke="#92978b" stroke-width="0.9" />
+<path d="M826 454.1h12" fill="none" stroke="#92978b" stroke-width="0.9" />
+<path d="M826 456.7h12" fill="none" stroke="#92978b" stroke-width="0.9" />
+<path d="M826 459.3h12" fill="none" stroke="#92978b" stroke-width="0.9" />
+<path d="M826 461.9h12" fill="none" stroke="#92978b" stroke-width="0.9" />
+<path d="M826 464.4h12" fill="none" stroke="#92978b" stroke-width="0.9" />
+<text x="845" y="448" style="font:600 10px Arial;fill:#423f38;stroke:#fbfaf6;stroke-width:3px;paint-order:stroke">SC</text></g>
+<g id="stair-EC" data-status="projected"><title>East wing / tower-side flight, Level 2 directory · projected only; no landing established here</title>
+<path d="M1073 343h14v18h-14Z" fill="#f4f3ec" stroke="#686e65" stroke-width="1.6" />
+<path d="M1074 345.6h12" fill="none" stroke="#92978b" stroke-width="0.9" />
+<path d="M1074 348.1h12" fill="none" stroke="#92978b" stroke-width="0.9" />
+<path d="M1074 350.7h12" fill="none" stroke="#92978b" stroke-width="0.9" />
+<path d="M1074 353.3h12" fill="none" stroke="#92978b" stroke-width="0.9" />
+<path d="M1074 355.9h12" fill="none" stroke="#92978b" stroke-width="0.9" />
+<path d="M1074 358.4h12" fill="none" stroke="#92978b" stroke-width="0.9" />
+<text x="1093" y="342" style="font:600 10px Arial;fill:#8c4e1d;stroke:#fbfaf6;stroke-width:3px;paint-order:stroke">EC?</text></g>
+<g id="stair-SE" data-status="projected"><title>Southeast perimeter flight, Level 2 directory · projected only; no landing established here</title>
+<path d="M1031 609h14v18h-14Z" fill="#f4f3ec" stroke="#686e65" stroke-width="1.6" />
+<path d="M1032 611.6h12" fill="none" stroke="#92978b" stroke-width="0.9" />
+<path d="M1032 614.1h12" fill="none" stroke="#92978b" stroke-width="0.9" />
+<path d="M1032 616.7h12" fill="none" stroke="#92978b" stroke-width="0.9" />
+<path d="M1032 619.3h12" fill="none" stroke="#92978b" stroke-width="0.9" />
+<path d="M1032 621.9h12" fill="none" stroke="#92978b" stroke-width="0.9" />
+<path d="M1032 624.4h12" fill="none" stroke="#92978b" stroke-width="0.9" />
+<text x="1051" y="608" style="font:600 10px Arial;fill:#8c4e1d;stroke:#fbfaf6;stroke-width:3px;paint-order:stroke">SE?</text></g>
+<g id="stair-DL" data-status="drawn"><title>Dining lounge southwest down steps; destination level unknown · source symbol; counterpart unconfirmed</title>
+<path d="M484 386h14v18h-14Z" fill="#f4f3ec" stroke="#686e65" stroke-width="1.6" />
+<path d="M485 388.6h12" fill="none" stroke="#92978b" stroke-width="0.9" />
+<path d="M485 391.1h12" fill="none" stroke="#92978b" stroke-width="0.9" />
+<path d="M485 393.7h12" fill="none" stroke="#92978b" stroke-width="0.9" />
+<path d="M485 396.3h12" fill="none" stroke="#92978b" stroke-width="0.9" />
+<path d="M485 398.9h12" fill="none" stroke="#92978b" stroke-width="0.9" />
+<path d="M485 401.4h12" fill="none" stroke="#92978b" stroke-width="0.9" />
+<text x="504" y="385" style="font:600 10px Arial;fill:#423f38;stroke:#fbfaf6;stroke-width:3px;paint-order:stroke">DL</text></g>
+</g>
+<g id="entrance-honor"><title>Honor Entrance: Level 1 detailed sheet; UCEN Veterans Lounge listing. Not a verified emergency exit.</title>
+<path d="M581 50L581 17" fill="none" stroke="#28645a" stroke-width="1" />
+<path d="M581 45l5 9h-10Z" fill="#28645a" stroke="white" stroke-width="1" />
+<text x="581" y="22" style="font:600 12px Arial;fill:#24574f;stroke:#fbfaf6;stroke-width:4px;paint-order:stroke">Honor Entrance</text></g>
+<g id="entrance-respect"><title>Respect Entrance: South directory triangle near Respect Lounge; UCEN Respect Lounge listing. Not a verified emergency exit.</title>
+<path d="M420 666L452 696" fill="none" stroke="#28645a" stroke-width="1" />
+<path d="M420 661l5 9h-10Z" fill="#28645a" stroke="white" stroke-width="1" />
+<text x="452" y="701" style="font:600 12px Arial;fill:#24574f;stroke:#fbfaf6;stroke-width:4px;paint-order:stroke">Respect Entrance</text></g>
+<g id="entrance-southwest"><title>Southwest entrance: Western south-edge triangle on the onsite Level 1 directory; descriptive name. Not a verified emergency exit.</title>
+<path d="M121 673L125 703" fill="none" stroke="#28645a" stroke-width="1" />
+<path d="M121 668l5 9h-10Z" fill="#28645a" stroke="white" stroke-width="1" />
+<text x="125" y="708" style="font:600 12px Arial;fill:#24574f;stroke:#fbfaf6;stroke-width:4px;paint-order:stroke">Southwest entrance</text></g>
+<g id="entrance-main"><title>12th Man Hall · main entrance area: UCEN identifies the hall as the main entrance; marker is approximate. Not a verified emergency exit.</title>
+<path d="M1144 576L1067 657" fill="none" stroke="#28645a" stroke-width="1" />
+<path d="M1144 571l5 9h-10Z" fill="#28645a" stroke="white" stroke-width="1" />
+<text x="1067" y="662" style="font:600 12px Arial;fill:#24574f;stroke:#fbfaf6;stroke-width:4px;paint-order:stroke">12th Man Hall · main entrance area</text></g>
+<metadata id="entrance-sources">Level 1 directory photograph; MSC First Floor Plan; https://ucenter.tamu.edu/facilities/memorial-student-center/points-of-interest/</metadata>
+</svg>

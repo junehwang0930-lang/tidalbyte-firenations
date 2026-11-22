@@ -4,12 +4,21 @@ from app.main import app
 from test_atlas_fire import corridor
 
 
-def test_default_startup_does_not_require_private_atlas_or_missing_training_router(monkeypatch):
+def test_fresh_checkout_serves_bundled_atlas(monkeypatch):
     monkeypatch.delenv('WAYFIND_LOCAL', raising=False)
-    with TestClient(app) as client:
+    with TestClient(app, base_url='http://localhost', client=('127.0.0.1', 50000)) as client:
         assert client.get('/health').json() == {'status': 'ok'}
         assert client.get('/api/graph').status_code == 200
-        assert client.get('/api/floor-atlas/scenario/catalog').status_code == 404
+        for floor in (1, 2):
+            plate = client.get(f'/api/floor-atlas/{floor}')
+            assert plate.status_code == 200 and 'image/svg+xml' in plate.headers['content-type']
+            assert 'viewBox="0 0 1240 740"' in plate.text
+        catalog = client.get('/api/floor-atlas/scenario/catalog').json()
+        assert any(room['id'] == '2300C' for room in catalog['rooms'])
+        route = client.get('/api/floor-atlas/scenario/route', params={'origin': '2300C', 'fire': '2300B'}).json()
+        assert route['status'] == 'ok' and route['forecast']['smoke']
+        assert [leg['level'] for leg in route['legs']] == [2, 1]
+        assert route['exitName'] and len(route['legs'][1]['points']) >= 2
 
 
 def test_atlas_route_computes_and_validates_inputs():

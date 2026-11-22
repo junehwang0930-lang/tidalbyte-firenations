@@ -21,7 +21,7 @@ export function useAtlas() {
   useEffect(() => {
     const controller = new AbortController();
     fetch('/api/floor-atlas/scenario/catalog', { signal: controller.signal }).then(async response => {
-      if (!response.ok) throw Error('Atlas unavailable. The private Level 1/2 drawings and scenario must be installed on the local backend.');
+      if (!response.ok) throw Error('Atlas unavailable. Start the demo backend on localhost.');
       return response.json() as Promise<Catalog>;
     }).then(result => { setCatalog(result); setOrigin(result.defaultRoom); setError(''); })
       .catch(reason => { if (!controller.signal.aborted) setError(String(reason.message)); });

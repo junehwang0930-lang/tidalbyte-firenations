@@ -68,13 +68,14 @@ export default function LocationPanel({ onFloor, onMapFix }: { onFloor: (floor: 
     }
     const watch = navigator.geolocation.watchPosition(position => {
       if (!active || position.timestamp <= latest) return;
-      latest = position.timestamp;
+      const timestamp = position.timestamp;
       const c = position.coords;
-      if (Date.now() - latest > 15000 || latest > Date.now() + 1000 ||
+      if (!Number.isFinite(timestamp) || Date.now() - timestamp > 15000 || timestamp > Date.now() + 1000 ||
           !Number.isFinite(c.latitude) || !Number.isFinite(c.longitude) ||
           !Number.isFinite(c.accuracy) || c.accuracy < 0) {
         setFix(null); setMessage('Device reading unavailable or stale.'); return;
       }
+      latest = timestamp;
       const before = model.current.floor;
       model.current.update({ altitude: c.altitude, accuracy: c.altitudeAccuracy, time: latest });
       if (model.current.floor && model.current.floor !== before) callback.current(model.current.floor);

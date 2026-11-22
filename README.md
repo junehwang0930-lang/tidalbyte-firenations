@@ -183,3 +183,38 @@ Commit `package-lock.json` with dependency changes. Python requirements pin
 runtime and test dependencies; reinstall them inside a virtual environment.
 Generated output, environments, caches, local editor files, and secrets are
 excluded by `.gitignore`.
+
+### Physical iPhone tracking check
+
+Use an HTTPS deployment with a certificate the phone trusts. Open Safari and
+tap **Track device location**. Grant Location and Motion & Orientation when
+prompted. Fire and smoke remain experimental simulations. Device readings stay
+in browser memory. Enable **Use device location for Bethancourt routes** to route from the anchor of a confidently matched section (2300A–E or the prefunction lobby). This requires verified Level 2 calibration, device tracking, and a confirmed floor. Turn the option off to select a room manually.
+
+- Deny location and confirm the permission message. Enable access in Safari
+  settings, stop tracking, restart it, and verify that accuracy updates.
+- Rotate across north and check for a smooth transition. Check the displayed
+  reference (magnetic compass, absolute orientation, or moving GPS course).
+- On a known floor, hold the phone at its usual carrying height and calibrate.
+  The provisional Floor 1 and Floor 2 elevations are 360 and 368 feet.
+  Calibration offsets the local altitude datum and carrying height. GPS
+  vertical accuracy must be within one meter. Expect uncertain results
+  indoors. Safari supplies geolocation altitude when available. A future
+  native barometer provider can feed timestamped calibrated elevations.
+- Take the stairs with a teammate and compare the estimated floor with the
+  posted floor. Verify that sustained changes switch floors, poor altitude
+  retains the last confirmed floor, and the floor picker still works.
+- Background Safari for more than 15 seconds, return, and check the freshness
+  indicator. Stop tracking and confirm that device data disappears.
+
+The atlas contains schematic drawings. To enable geographic projection, enter
+three verified, non-collinear control points per floor in
+`data/floor-atlas/calibration.json`. Each point needs WGS84 `latitude` and
+`longitude` and the corresponding atlas `x` and `y` in the 1240 × 740 view.
+Check residual error against a fourth independently surveyed point before
+using the configuration. Leave the floor empty if that correspondence cannot
+be verified. Projection uses the surveyed triangle and displays a horizontal
+uncertainty radius. It supplies an estimated marker only.
+
+Run `node --experimental-strip-types --test tests/*.test.mjs` in `frontend`
+for the positioning checks. The physical-device checklist requires an iPhone.

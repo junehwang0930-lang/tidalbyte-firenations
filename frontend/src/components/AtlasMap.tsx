@@ -3,8 +3,10 @@ import type { AtlasRoute } from '../useAtlas';
 import levelOne from '../../../data/floor-atlas/level-1.svg?url';
 import levelTwo from '../../../data/floor-atlas/level-2.svg?url';
 
-export default function AtlasMap({ floor, route, offline, onAvailability }: {
-  floor: number; route: AtlasRoute | null; offline: boolean; onAvailability?: (available: boolean) => void;
+import type { MapFix } from '../positioning';
+
+export default function AtlasMap({ mapFix, floor, route, offline, onAvailability }: {
+  mapFix: MapFix | null; floor: number; route: AtlasRoute | null; offline: boolean; onAvailability?: (available: boolean) => void;
 }) {
   const marker = useId();
   const [image, setImage] = useState<'loading' | 'ready' | 'failed'>('loading');
@@ -26,6 +28,10 @@ export default function AtlasMap({ floor, route, offline, onAvailability }: {
           markerEnd={floor === 1 ? `url(#${marker})` : undefined} />)}
       {floor === 2 && route.firePolygon.length > 0 &&
         <polygon points={route.firePolygon.map(p => p.join(',')).join(' ')} className="atlas-fire-area" />}
+    </svg>}
+    {image === 'ready' && mapFix?.floor === floor && <svg className="atlas-overlay" viewBox="0 0 1240 740" aria-label="Estimated device location">
+      <circle cx={mapFix.x} cy={mapFix.y} r={mapFix.radius} fill="var(--accent)" opacity=".18" />
+      <circle className="location-dot" cx={mapFix.x} cy={mapFix.y} r="5" />
     </svg>}
   </div>;
 }

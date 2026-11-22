@@ -97,3 +97,23 @@ export function projectFix(refs: Reference[], latitude: number, longitude: numbe
   if (!(x >= 0 && x <= 1240 && y >= 0 && y <= 740 && Number.isFinite(scale))) return null;
   return { x, y, radius: accuracy*scale, floor };
 }
+
+// Require the entire horizontal uncertainty circle to fit inside one mapped room.
+export function matchBethancourt(fix: MapFix | null, rooms: { id: string; polygon: number[][] }[]) {
+  if (!fix || fix.floor !== 2 || !Number.isFinite(fix.radius) || fix.radius < 0) return null;
+  const matches = rooms.filter(({ id, polygon }) => {
+    if (!/^2300[A-E]$/.test(id) && id !== 'front-lobby') return false;
+    let inside = false;
+    for (let i = 0; i < polygon.length; i++) {
+      const [x,y] = polygon[i], [u,v] = polygon[(i+1) % polygon.length];
+      const dx = u-x, dy = v-y;
+      const lengthSquared = dx*dx + dy*dy;
+      if (!lengthSquared) continue;
+      const t = Math.max(0, Math.min(1, ((fix.x-x)*dx + (fix.y-y)*dy)/lengthSquared));
+      if (Math.hypot(fix.x-x-t*dx, fix.y-y-t*dy) <= fix.radius) return false;
+      if ((y > fix.y) !== (v > fix.y) && fix.x < x + dx*(fix.y-y)/dy) inside = !inside;
+    }
+    return inside;
+  });
+  return matches.length === 1 ? matches[0].id : null;
+}

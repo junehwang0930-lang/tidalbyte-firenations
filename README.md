@@ -189,7 +189,7 @@ excluded by `.gitignore`.
 Use an HTTPS deployment with a certificate the phone trusts. Open Safari and
 tap **Track device location**. Grant Location and Motion & Orientation when
 prompted. Fire and smoke remain experimental simulations. Device readings stay
-in browser memory. The route still uses the room selected in the simulator.
+in browser memory. Enable **Use device location for Bethancourt routes** to route from the anchor of a confidently matched section (2300A–E or the prefunction lobby). This requires verified Level 2 calibration, device tracking, and a confirmed floor. Turn the option off to select a room manually.
 
 - Deny location and confirm the permission message. Enable access in Safari
   settings, stop tracking, restart it, and verify that accuracy updates.

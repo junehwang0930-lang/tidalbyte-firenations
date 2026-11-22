@@ -8,10 +8,13 @@ export type AtlasRoute = {
 };
 type Catalog = { rooms: { id: string; label: string }[]; defaultRoom: string };
 
-export function useAtlas() {
+export function useAtlas(deviceRoom?: string | null) {
   const [catalog, setCatalog] = useState<Catalog | null>(null);
   const [offline, setOffline] = useState(false);
-  const [origin, setOrigin] = useState('');
+  const [manualOrigin, setOrigin] = useState('');
+  const origin = deviceRoom === undefined ? manualOrigin :
+    catalog?.rooms.some(room => room.id === deviceRoom) ? deviceRoom! : '';
+  const [resultOrigin, setResultOrigin] = useState('');
   const [fire, setFire] = useState('');
   const [route, setRoute] = useState<AtlasRoute | null>(null);
   const [error, setError] = useState('Loading training map…');
@@ -57,7 +60,7 @@ export function useAtlas() {
         : fetch(`/api/floor-atlas/scenario/route?${query}`, { signal: controller.signal, cache: 'no-store' })
           .then(async response => { if (!response.ok) throw Error('Route unavailable. Clear/reset the scenario or check the backend.'); return response.json() as Promise<AtlasRoute>; });
       request
-        .then(result => { if (id === requestId.current) setRoute(result); })
+        .then(result => { if (id === requestId.current) { setResultOrigin(origin); setRoute(result); } })
         .catch(reason => { if (id === requestId.current && !controller.signal.aborted) setError(reason.message); })
         .finally(() => { if (id === requestId.current) setLoading(false); });
     }
@@ -66,7 +69,7 @@ export function useAtlas() {
     return () => { ++requestId.current; controller?.abort(); window.clearTimeout(timer); document.removeEventListener('visibilitychange', resume); };
   }, [origin, fire, version, offline]);
   const invalidate = () => { ++requestId.current; setRoute(null); setError(''); };
-  return { catalog, offline, origin, fire, route, error, loading,
+  return { catalog, offline, origin, fire, route: origin && resultOrigin === origin ? route : null, error, loading,
     selectOrigin: (value: string) => { invalidate(); setOrigin(value); setVersion(v => v + 1); },
     selectFire: (value: string) => { invalidate(); ignition.current = value ? Date.now() : null; setFire(value); setVersion(v => v + 1); },
     refresh: () => { invalidate(); setVersion(v => v + 1); },

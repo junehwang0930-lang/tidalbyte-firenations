@@ -27,3 +27,17 @@ test('uncalibrated and inaccurate fixes never project', () => {
   const fix=projectFix(refs,.0002,.0002,2,1);
   assert.ok(Math.abs(fix.x-40)<.001 && Math.abs(fix.y-40)<.001);
 });
+
+test('Bethancourt requires an unambiguous Level 2 section', async () => {
+  const { matchBethancourt } = await import('../src/positioning.ts');
+  const { readFileSync } = await import('node:fs');
+  const { rooms } = JSON.parse(readFileSync(new URL('../../data/floor-atlas/scenario.json', import.meta.url)));
+  for (const room of rooms.filter(r => r.label.includes('Bethancourt'))) {
+    const [first,, opposite] = room.polygon;
+    const fix = {x:(first[0]+opposite[0])/2, y:(first[1]+opposite[1])/2, radius:3, floor:2};
+    assert.equal(matchBethancourt(fix, rooms),room.id);
+    assert.equal(matchBethancourt({...fix,floor:1},rooms),null);
+  }
+  assert.equal(matchBethancourt({x:208,y:500,radius:4,floor:2},rooms),null);
+  assert.equal(matchBethancourt(null,rooms),null);
+});

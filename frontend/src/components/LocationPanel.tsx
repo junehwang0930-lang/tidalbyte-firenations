@@ -110,7 +110,7 @@ export default function LocationPanel({ onFloor, onMapFix }: { onFloor: (floor: 
       setMessage(''); model.current = new FloorEstimator();
     }}>{enabled ? 'Stop device tracking' : 'Track device location'}</button>
     {message && <p role="status">{message}</p>}
-    {enabled && <p>Live device readings · Route starts at the selected demo room.</p>}
+    {enabled && <p>Live device readings · Fire conditions are simulated.</p>}
     {fix && <p>Horizontal accuracy ±{Math.round(fix.coords.accuracy)} m · Altitude {fix.coords.altitude === null ? 'unavailable' : fix.coords.altitude.toFixed(1) + ' m'}</p>}
     {enabled && <p>{heading !== null ? motion + ' ' + Math.round(heading) % 360 + '°' :
       fix && (fix.coords.speed ?? 0) > 1 && fix.coords.heading !== null ? 'Travel direction ' + Math.round(fix.coords.heading) + '°' : motion.includes('permission') ? motion : 'Heading unavailable'}</p>}
